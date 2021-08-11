@@ -78,3 +78,6 @@ mvn spring-boot:run
 cd confirmation
 mvn spring-boot:run
 ```
+
+## DDD의 적용
+
