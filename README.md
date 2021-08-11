@@ -64,3 +64,17 @@
 ## Hexagonal Architecture Diagram
 
 ![Hexagonal](https://user-images.githubusercontent.com/3106233/129030761-f4adc773-9505-4522-8416-f263369fee43.png)
+
+# 구현
+세 개의 Microservice를 Springboot로 구현했으며, 다음과 같이 실행해 Local test를 진행했다.
+
+```
+cd order
+mvn spring-boot:run
+
+cd payment
+mvn spring-boot:run
+
+cd confirmation
+mvn spring-boot:run
+```
