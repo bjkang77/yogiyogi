@@ -39,3 +39,9 @@
 3. 부하 발생 시 자동으로 처리 프로세스를 증가시킨다. (Autoscale)
 
 # 분석 설계
+## Event Storming
+
+- MSAEZ에서 Event Storming 수행
+
+![Design 1](https://user-images.githubusercontent.com/3106233/129028006-01a3c037-b365-4a82-bf88-c067868117c6.png)
+
