@@ -50,7 +50,7 @@
 ![슬라이드3](https://user-images.githubusercontent.com/3106233/129735198-642b10b0-86b4-49c3-b608-ad3a4dec4914.PNG)
 
 - Policy 부착
-- 
+
 ![슬라이드4](https://user-images.githubusercontent.com/3106233/129735339-6fa82c18-44b5-452c-9c67-1728e1a4c115.PNG)
 
 - Aggregate 부착
@@ -67,13 +67,12 @@
 
 기능적 요구사항 커버 여부 검증
 
-1. 사용자는 원하는 재능을 예약한다. (O)
+1. 사용자는 원하는 숙소를 예약한다. (O)
 2. 사용자가 결제를 완료하면 예약이 완료된다. (O)
 3. 사용자가 결제를 완료하지 못하면 예약이 취소된다. (O)
-4. 예약이 완료되면 예약 상세 내역이 담당자에게 전달된다. (O)
-5. 담당자는 내역을 확인하고 확정한다. (O)
-6. 사용자는 예약 현황을 조회할 수 있다. (O)
-7. 사용자는 중간에 예약을 취소할 수 있으며, 해당 예약은 삭제된다. (O)
+4. 예약이 완료되면 담당자는 내역을 확인하고 확정한다. (O)
+5. 사용자는 예약 현황을 조회할 수 있다. (O)
+6. 사용자는 중간에 예약을 취소할 수 있으며, 해당 예약은 삭제된다. (O)
 
 비기능적 요구사항 커버 여부 검증
 
@@ -83,7 +82,8 @@
 
 ## Hexagonal Architecture Diagram
 
-![Hexagonal](https://user-images.githubusercontent.com/3106233/129030761-f4adc773-9505-4522-8416-f263369fee43.png)
+![슬라이드8](https://user-images.githubusercontent.com/3106233/129735687-d54b9e92-1259-4d6b-8cd0-a4a45b1fc543.PNG)
+
 
 # 구현
 세 개의 Microservice를 Springboot로 구현했으며, 다음과 같이 실행해 Local test를 진행했다.
