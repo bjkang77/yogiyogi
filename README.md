@@ -7,8 +7,8 @@
   - [분석 설계](#분석-설계)
   - [구현](#구현)
     - [DDD 의 적용](#ddd의-적용)
-    - [폴리글랏 퍼시스턴스](#폴리글랏-퍼시스턴스)
-    - [폴리글랏 프로그래밍](#폴리글랏-프로그래밍)
+    - [Polyglot Persistence](#Polyglot-Persistence)
+    - [CQRS](#CQRS)
     - [동기식 호출 과 Fallback 처리](#동기식-호출-과-Fallback-처리)
     - [비동기식 호출 과 Eventual Consistency](#비동기식-호출-과-Eventual-Consistency)
   - [운영](#운영)
@@ -93,19 +93,19 @@
 다섯 개의 Microservice를 Springboot로 구현했으며, 다음과 같이 실행해 Local test를 진행했다. Port number는 8081~8084이다.
 
 ```
-cd customer
+cd /home/jacesky/code/yanolza/customer
 mvn spring-boot:run
 
-cd gateway
+/home/jacesky/code/yanolza/gateway
 mvn spring-boot:run
 
-cd order
+/home/jacesky/code/yanolza/order
 mvn spring-boot:run
 
-cd payment
+/home/jacesky/code/yanolza/payment
 mvn spring-boot:run
 
-cd reservation
+/home/jacesky/code/yanolza/reservation
 mvn spring-boot:run
 ```
 
@@ -178,102 +178,141 @@ public interface PaymentHistoryRepository extends PagingAndSortingRepository<Pay
 - 적용 후 REST API 의 테스트
 ```
 # app 서비스의 주문처리
-http localhost:8081/orders item="통닭"
+http localhost:8081/orders hotelId=4001 roomType=delux
 
-# store 서비스의 배달처리
-http localhost:8083/주문처리s orderId=1
+# pay 서비스의 결제처리
+http localhost:8083/payments orderId=3 payMethod=card price=100000
+
+# hotel 서비스의 예약처리
+http localhost:8082/reservations orderId=3 status="confirmed"
 
 # 주문 상태 확인
+http localhost:8081/orders/3
+
+```
+
+
+## Polyglot Persistence
+
+Polyglot Persistence를 위해 h2datase를 hsqldb로 변경
+
+```
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+<!--
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+-->
+
+# 변경/재기동 후 예약 주문
+http localhost:8081/orders hotelId=2001 roomType=standard
+
+HTTP/1.1 201 
+Content-Type: application/json;charset=UTF-8
+Date: Mon, 22 Feb 2021 06:11:15 GMT
+Location: http://localhost:8081/orders/1
+Transfer-Encoding: chunked
+
+{
+    "_links": {
+        "order": {
+            "href": "http://localhost:8081/orders/1"
+        },
+        "self": {
+            "href": "http://localhost:8081/orders/1"
+        }
+    },
+    "hotelId": "2001",
+    "roomType": "standard",
+    "status": null
+}
+
+# 저장이 잘 되었는지 조회
 http localhost:8081/orders/1
 
-```
+HTTP/1.1 200 
+Content-Type: application/hal+json;charset=UTF-8
+Date: Mon, 22 Feb 2021 06:17:40 GMT
+Transfer-Encoding: chunked
 
-
-## 폴리글랏 퍼시스턴스
-
-앱프런트 (app) 는 서비스 특성상 많은 사용자의 유입과 상품 정보의 다양한 콘텐츠를 저장해야 하는 특징으로 인해 RDB 보다는 Document DB / NoSQL 계열의 데이터베이스인 Mongo DB 를 사용하기로 하였다. 이를 위해 order 의 선언에는 @Entity 가 아닌 @Document 로 마킹되었으며, 별다른 작업없이 기존의 Entity Pattern 과 Repository Pattern 적용과 데이터베이스 제품의 설정 (application.yml) 만으로 MongoDB 에 부착시켰다
-
-```
-# Order.java
-
-package fooddelivery;
-
-@Document
-public class Order {
-
-    private String id; // mongo db 적용시엔 id 는 고정값으로 key가 자동 발급되는 필드기 때문에 @Id 나 @GeneratedValue 를 주지 않아도 된다.
-    private String item;
-    private Integer 수량;
-
+{
+    "_links": {
+        "order": {
+            "href": "http://localhost:8081/orders/1"
+        },
+        "self": {
+            "href": "http://localhost:8081/orders/1"
+        }
+    },
+    "hotelId": "2001",
+    "roomType": "standard",
+    "status": null
 }
+```
 
+## CQRS
 
-# 주문Repository.java
-package fooddelivery;
+CQRS 구현을 위해 고객의 예약 상황을 확인할 수 있는 Mypage를 구성.
 
-public interface 주문Repository extends JpaRepository<Order, UUID>{
+```
+# mypage 호출 
+http localhost:8081/mypages/12
+
+HTTP/1.1 200 
+Content-Type: application/hal+json;charset=UTF-8
+Date: Wed, 24 Feb 2021 00:09:57 GMT
+Transfer-Encoding: chunked
+
+{
+    "_links": {
+        "mypage": {
+            "href": "http://localhost:8081/mypages/12"
+        },
+        "self": {
+            "href": "http://localhost:8081/mypages/12"
+        }
+    },
+    "hotelId": "3001",
+    "orderId": 11,
+    "payMethod": "card",
+    "paymentId": null,
+    "price": 100000,
+    "reservationId": 2,
+    "roomType": "suite",
+    "status": "Confirming reservation"
 }
-
-# application.yml
-
-  data:
-    mongodb:
-      host: mongodb.default.svc.cluster.local
-    database: mongo-example
-
-```
-
-## 폴리글랏 프로그래밍
-
-고객관리 서비스(customer)의 시나리오인 주문상태, 배달상태 변경에 따라 고객에게 카톡메시지 보내는 기능의 구현 파트는 해당 팀이 python 을 이용하여 구현하기로 하였다. 해당 파이썬 구현체는 각 이벤트를 수신하여 처리하는 Kafka consumer 로 구현되었고 코드는 다음과 같다:
-```
-from flask import Flask
-from redis import Redis, RedisError
-from kafka import KafkaConsumer
-import os
-import socket
-
-
-# To consume latest messages and auto-commit offsets
-consumer = KafkaConsumer('fooddelivery',
-                         group_id='',
-                         bootstrap_servers=['localhost:9092'])
-for message in consumer:
-    print ("%s:%d:%d: key=%s value=%s" % (message.topic, message.partition,
-                                          message.offset, message.key,
-                                          message.value))
-
-    # 카톡호출 API
-```
-
-파이선 애플리케이션을 컴파일하고 실행하기 위한 도커파일은 아래와 같다 (운영단계에서 할일인가? 아니다 여기 까지가 개발자가 할일이다. Immutable Image):
-```
-FROM python:2.7-slim
-WORKDIR /app
-ADD . /app
-RUN pip install --trusted-host pypi.python.org -r requirements.txt
-ENV NAME World
-EXPOSE 8090
-CMD ["python", "policy-handler.py"]
 ```
 
 
 ## 동기식 호출 과 Fallback 처리
 
-분석단계에서의 조건 중 하나로 주문(app)->결제(pay) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다. 
+주문(Order)->결제(Payment) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다.
 
 - 결제서비스를 호출하기 위하여 Stub과 (FeignClient) 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
 
 ```
-# (app) 결제이력Service.java
+#PaymentHistoryService.java
 
-package fooddelivery.external;
+package yanolza.external;
 
-@FeignClient(name="pay", url="http://localhost:8082")//, fallback = 결제이력ServiceFallback.class)
-public interface 결제이력Service {
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-    @RequestMapping(method= RequestMethod.POST, path="/결제이력s")
-    public void 결제(@RequestBody 결제이력 pay);
+import java.util.Date;
+
+@FeignClient(name="payment", url="${api.payment.url}")
+public interface PaymentHistoryService {
+    @RequestMapping(method= RequestMethod.POST, path="/paymentHistories")
+    public void pay(@RequestBody PaymentHistory paymentHistory);
 
 }
 ```
@@ -284,13 +323,24 @@ public interface 결제이력Service {
 
     @PostPersist
     public void onPostPersist(){
+        Ordered ordered = new Ordered();
+        BeanUtils.copyProperties(this, ordered);
+        ordered.publishAfterCommit();
 
-        fooddelivery.external.결제이력 pay = new fooddelivery.external.결제이력();
-        pay.setOrderId(getOrderId());
+        //Following code causes dependency to external APIs
+        // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
+
+        yanolza.external.PaymentHistory paymentHistory = new yanolza.external.PaymentHistory();
+        // mappings goes here
+        //PaymentHistory payment = new PaymentHistory();
+        System.out.println("this.id() : " + this.id);
+        paymentHistory.setOrderId(this.id);
+        paymentHistory.setStatus("Reservation Good");
+        paymentHistory.setCardNo(this.cardNo);      
         
-        Application.applicationContext.getBean(fooddelivery.external.결제이력Service.class)
-                .결제(pay);
-    }
+        
+        OrderApplication.applicationContext.getBean(yanolza.external.PaymentHistoryService.class)
+            .pay(paymentHistory);
 ```
 
 - 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:
