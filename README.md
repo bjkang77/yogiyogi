@@ -175,16 +175,34 @@ public interface PaymentHistoryRepository extends PagingAndSortingRepository<Pay
 - 적용 후 REST API 의 테스트
 ```
 # order 서비스의 주문처리
-http localhost:8081/orders name="KimGangMin" cardNo=0 status="order started"
+http localhost:8081/orders name="KimGM" cardNo=0 status="order start"
 
 # payment 서비스의 결제처리
 http localhost:8088/paymentHistories orderId=1 cardNo=0000
 
 # reservation 서비스의 예약처리
-http localhost:8088/reservations orderId=3 status="confirmed"
+http localhost:8088/reservations orderId=1 status="confirmed"
 
 # 주문 상태 확인    
-http localhost:8081/orders/3
+http localhost:8081/orders/1
+HTTP/1.1 200
+Content-Type: application/hal+json;charset=UTF-8
+Date: Thu, 19 Aug 2021 02:05:39 GMT
+Transfer-Encoding: chunked
+
+{
+    "_links": {
+        "order": {
+            "href": "http://localhost:8081/orders/1"
+        },
+        "self": {
+            "href": "http://localhost:8081/orders/1"
+        }
+    },
+    "cardNo": 0,
+    "name": "KimGM",
+    "status": "order start"
+}
 
 ```
 
