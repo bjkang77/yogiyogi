@@ -545,7 +545,8 @@ spec:
 
 ```
 
-- istio-injection 활성화 
+
+- istio-injection 활성화 (CB_setting.jpg 추가) (CB_apply.jpg 추가)
 ```
 kubectl label namespace default istio-injection=enabled 
 
@@ -565,19 +566,8 @@ kube-public       Active   109m
 kube-system       Active   109m
 ```
 
-- 부하TEST 준비
-```
-ie98dh@LAPTOP-7QPQK9AV:~/project/yanolza/yanolza-team/kubernetes$ kubectl get pod 
-NAME                           READY   STATUS    RESTARTS   AGE
-order-65b64d8b85-xj7gj         1/1     Running   0          55m
-payment-689c565447-4zlvt       1/1     Running   0          55m
-siege-c54d6bdc7-xc85x          2/2     Running   0          36m
 
-kubectl exec pod/siege-c54d6bdc7-xc85x -it -- /bin/bash
-
-```
-
-- 1명이 10초간 부하 발생하여 100% 정상처리 확인
+- 1명이 10초간 부하 발생하여 100% 정상처리 확인(CB_load_st_be.jpg 추가)
 ```
 siege -c1 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
 
@@ -610,7 +600,7 @@ Longest transaction:            0.08
 Shortest transaction:           0.01
 ```
 
-- 2명이 10초간 부하 발생하여 93.18% 정상처리, 47건 실패 확인
+- 10명이 10초간 부하 발생하여 82.05% 정상처리, 168건 실패 확인(CB_load_rs_af.jpg 추가)
 ```
 siege -c2 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
 
