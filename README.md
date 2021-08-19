@@ -685,66 +685,53 @@ Concurrency:		       96.02
 * 먼저 무정지 재배포가 100% 되는 것인지 확인하기 위해서 Autoscaler 이나 CB 설정을 제거함
 - customer microservice v2 이미지를 생성해 deploy
 - 새 터미널에서 seige 로 배포작업 직전에 워크로드를 모니터링 함.
-- 
-```
-siege -v -c1 -t80S http://customer:8080
-
-** SIEGE 4.0.5
-** Preparing 100 concurrent users for battle.
-The server is now under siege...
-
-HTTP/1.1 201     0.68 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.68 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.70 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.70 secs:     207 bytes ==> POST http://localhost:8081/orders
-:
-```
-
 - 새버전으로 배포
+
 ```
 kubectl apply -f /home/jacesky/yanolza-team/kubernetes/deployment_readiness_v1.yml
 ```
 
 - seige에서  Availability 가 100% 미만으로 떨어졌는지 확인
-```
-Transactions:                   1500 hits
-Availability:                  59.43 %
-Elapsed time:                  20.89 secs
-Data transferred:               0.32 MB
-Response time:                  0.01 secs
-Transaction rate:              71.80 trans/sec
-Throughput:                     0.02 MB/sec
-Concurrency:                    0.99
-Successful transactions:        1500
-Failed transactions:            1024
-Longest transaction:            1.04
-Shortest transaction:           0.00
-```
 
-배포기간중 Availability 가 평소 100%에서 70% 대로 떨어지는 것을 확인. Kubernetes가 신규로 Deploy된 Microservice를 준비 상태로 인식해 서비스 수행했기 때문임.
+![Readiness 1](https://user-images.githubusercontent.com/3106233/130053885-2bece799-de7e-44e4-b6eb-f588a0fd37e2.png)
+
+배포기간중 Availability 가 평소 100%에서 90%대로 떨어지는 것을 확인. Kubernetes가 신규로 Deploy된 Microservice를 준비 상태로 인식해 서비스 수행했기 때문임.
 방지를 위해 Readiness Probe 를 설정함:
 
 ```
 # deployment.yaml 의 readiness probe 의 설정:
-
-
 kubectl apply -f kubernetes/deployment.yaml
 ```
 
 - 동일한 시나리오로 재배포 한 후 Availability 확인:
-```
-Transactions:                   4899 hits
-Availability:                  99.69 %
-Elapsed time:                  59.43 secs
-Data transferred:               0.76 MB
-Response time:                  0.01 secs
-Transaction rate:              82.43 trans/sec
-Throughput:                     0.01 MB/sec
-Concurrency:                    0.74
-Successful transactions:        4899
-Failed transactions:              15
-Longest transaction:            1.03
-Shortest transaction:           0.00
-```
+
+![Readiness 2](https://user-images.githubusercontent.com/3106233/130053849-49de6039-299a-47fa-adde-dac3e114dab0.png)
 
 배포기간 동안 Availability 가 변화없기 때문에 무정지 재배포가 성공한 것으로 확인됨.
+
+
+## Liveness
+
+임의로 Pod의 Health check에 문제를 발생시키고, Liveness Probe가 Pod를 재기동하는지 확인
+
+```
+          args:
+          - /bin/sh
+          - -c
+          - touch /tmp/healthy; sleep 90; rm -rf /tmp/healthy; sleep 600
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            exec:
+              command:
+              - cat
+              - /tmp/healthy
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 5
+```	    
+
+RESTARTS 회수가 증가함.
+
+![Liveness](https://user-images.githubusercontent.com/3106233/130054276-24f98bd4-9481-47e0-bf23-a47ad074fb7f.png)
