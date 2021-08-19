@@ -527,7 +527,7 @@ http localhost:8084/mypages     # 예약 상태가 "Reservation Complete"으로 
 
 - DestinationRule 를 생성하여 circuit break 가 발생할 수 있도록 설정 최소 connection pool 설정
 ```
-# destination-rule.yaml*
+# destination-rule.yaml
 
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
