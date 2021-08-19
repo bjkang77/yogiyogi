@@ -519,24 +519,127 @@ http localhost:8084/mypages     # 예약 상태가 "Reservation Complete"으로 
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
-* 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
+## 서킷 브레이킹(덕호작성완료)
 
-시나리오는 단말앱(app)-->결제(pay) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
+* 서킷 브레이킹 프레임워크의 선택: istio 사용하여 구현.
 
-- Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
+시나리오는 주문(order) → 결제(payment) 시의 연결이 Request/Response 로 연동하여 구현이 되어있고, 주문 요청이 과도할 경우 CB 를 통하여 장애격리.
+
+- DestinationRule 를 생성하여 circuit break 가 발생할 수 있도록 설정 최소 connection pool 설정
 ```
-# application.yml
+# destination-rule.yaml*
 
-hystrix:
-  command:
-    # 전역설정
-    default:
-      execution.isolation.thread.timeoutInMilliseconds: 610
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: order
+spec:
+  host: order
+  trafficPolicy:
+    connectionPool:
+      http:
+        http1MaxPendingRequests: 1
+        maxRequestsPerConnection: 1
 
 ```
 
-- 피호출 서비스(결제:pay) 의 임의 부하 처리 - 400 밀리에서 증감 220 밀리 정도 왔다갔다 하게
+- istio-injection 활성화 
 ```
+kubectl label namespace default istio-injection=enabled 
+
+ie98dh@LAPTOP-7QPQK9AV:~/project/yanolza/yanolza-team$ kubectl label namespace default istio-injection=enabled
+namespace/default labeled
+
+
+kubectl get ns -L istio-injection
+
+ie98dh@LAPTOP-7QPQK9AV:~/project/yanolza/yanolza-team$ kubectl get ns -L istio-injection
+NAME              STATUS   AGE    ISTIO-INJECTION
+default           Active   109m   enabled
+istio-system      Active   92m    disabled
+kafka             Active   95m
+kube-node-lease   Active   109m
+kube-public       Active   109m
+kube-system       Active   109m
+```
+
+- 부하TEST 준비
+```
+ie98dh@LAPTOP-7QPQK9AV:~/project/yanolza/yanolza-team/kubernetes$ kubectl get pod 
+NAME                           READY   STATUS    RESTARTS   AGE
+order-65b64d8b85-xj7gj         1/1     Running   0          55m
+payment-689c565447-4zlvt       1/1     Running   0          55m
+siege-c54d6bdc7-xc85x          2/2     Running   0          36m
+
+kubectl exec pod/siege-c54d6bdc7-xc85x -it -- /bin/bash
+
+```
+
+- 1명이 10초간 부하 발생하여 100% 정상처리 확인
+```
+siege -c1 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
+
+
+root@siege-c54d6bdc7-xc85x:/# siege -c1 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
+** SIEGE 4.0.4
+** Preparing 1 concurrent users for battle.
+The server is now under siege...
+HTTP/1.1 201     0.04 secs:     213 bytes ==> POST http://order:8080/orders
+HTTP/1.1 201     0.02 secs:     213 bytes ==> POST http://order:8080/orders
+HTTP/1.1 201     0.02 secs:     213 bytes ==> POST http://order:8080/orders
+HTTP/1.1 201     0.02 secs:     213 bytes ==> POST http://order:8080/orders
+HTTP/1.1 201     0.02 secs:     213 bytes ==> POST http://order:8080/orders
+HTTP/1.1 201     0.02 secs:     213 bytes ==> POST http://order:8080/orders
+...
+
+
+Lifting the server siege...
+Transactions:                    405 hits
+Availability:                 100.00 %
+Elapsed time:                   9.93 secs
+Data transferred:               0.08 MB
+Response time:                  0.02 secs
+Transaction rate:              40.79 trans/sec
+Throughput:                     0.01 MB/sec
+Concurrency:                    0.99
+Successful transactions:         405
+Failed transactions:               0
+Longest transaction:            0.08
+Shortest transaction:           0.01
+```
+
+- 2명이 10초간 부하 발생하여 93.18% 정상처리, 47건 실패 확인
+```
+siege -c2 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
+
+root@siege-c54d6bdc7-xc85x:/# siege -c2 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
+** SIEGE 4.0.4
+** Preparing 2 concurrent users for battle.
+The server is now under siege...
+HTTP/1.1 503     0.00 secs:      81 bytes ==> POST http://order:8080/orders
+HTTP/1.1 201     0.04 secs:     215 bytes ==> POST http://order:8080/orders
+HTTP/1.1 201     0.05 secs:     215 bytes ==> POST http://order:8080/orders
+HTTP/1.1 201     0.02 secs:     215 bytes ==> POST http://order:8080/orders
+HTTP/1.1 201     0.05 secs:     215 bytes ==> POST http://order:8080/orders
+HTTP/1.1 201     0.05 secs:     215 bytes ==> POST http://order:8080/orders
+...
+
+
+Lifting the server siege...
+Transactions:                    642 hits
+Availability:                  93.18 %
+Elapsed time:                   9.16 secs
+Data transferred:               0.14 MB
+Response time:                  0.03 secs
+Transaction rate:              70.09 trans/sec
+Throughput:                     0.01 MB/sec
+Concurrency:                    1.97
+Successful transactions:         642
+Failed transactions:              47
+Longest transaction:            0.15
+```
+
+
 # (pay) 결제이력.java (Entity)
 
     @PrePersist
