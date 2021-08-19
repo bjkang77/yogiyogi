@@ -707,16 +707,20 @@ kubectl apply -f /home/jacesky/yanolza-team/kubernetes/deployment_readiness_v1.y
 
 - seige에서  Availability 가 100% 미만으로 떨어졌는지 확인
 ```
-Transactions:		        3078 hits
-Availability:		       70.45 %
-Elapsed time:		       120 secs
-Data transferred:	        0.34 MB
-Response time:		        5.60 secs
-Transaction rate:	       17.15 trans/sec
-Throughput:		        0.01 MB/sec
-Concurrency:		       96.02
-
+Transactions:                   1500 hits
+Availability:                  59.43 %
+Elapsed time:                  20.89 secs
+Data transferred:               0.32 MB
+Response time:                  0.01 secs
+Transaction rate:              71.80 trans/sec
+Throughput:                     0.02 MB/sec
+Concurrency:                    0.99
+Successful transactions:        1500
+Failed transactions:            1024
+Longest transaction:            1.04
+Shortest transaction:           0.00
 ```
+
 배포기간중 Availability 가 평소 100%에서 70% 대로 떨어지는 것을 확인. Kubernetes가 신규로 Deploy된 Microservice를 준비 상태로 인식해 서비스 수행했기 때문임.
 방지를 위해 Readiness Probe 를 설정함:
 
