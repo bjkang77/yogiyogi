@@ -16,6 +16,8 @@
     - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출-서킷-브레이킹-장애격리)
     - [오토스케일 아웃](#오토스케일-아웃)
     - [무정지 재배포](#무정지-재배포)
+    - [Liveness](#Liveness)
+    - [Persistence Volume](#Persistence_Volume)
 
 
 # 서비스 시나리오
@@ -735,3 +737,11 @@ kubectl apply -f kubernetes/deployment.yaml
 RESTARTS 회수가 증가함.
 
 ![Liveness](https://user-images.githubusercontent.com/3106233/130054276-24f98bd4-9481-47e0-bf23-a47ad074fb7f.png)
+
+
+## Persistence Volume
+신규로 생성한 EFS Storage에 Pod가 접근할 수 있도록 권한 및 서비스 설정.
+
+- df-k로 EFS에 접근 가능
+
+![Volume](https://user-images.githubusercontent.com/3106233/130055195-aea654fa-d7df-4df8-9c57-53343f4e06ab.png)
