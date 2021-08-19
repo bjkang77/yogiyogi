@@ -521,9 +521,9 @@ http localhost:8084/mypages     # 예약 상태가 "Reservation Complete"으로 
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
-## 서킷 브레이킹(덕호작성완료)
+## Circuit Breaker
 
-* 서킷 브레이킹 프레임워크의 선택: istio 사용하여 구현.
+* Circuit Breaker 프레임워크의 선택: istio 사용하여 구현.
 
 시나리오는 주문(order) → 결제(payment) 시의 연결이 Request/Response 로 연동하여 구현이 되어있고, 주문 요청이 과도할 경우 CB 를 통하여 장애격리.
 
