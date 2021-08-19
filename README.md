@@ -17,7 +17,7 @@
     - [오토스케일 아웃](#오토스케일-아웃)
     - [무정지 재배포](#무정지-재배포)
     - [Liveness](#Liveness)
-    - [Persistence Volume](#Persistence_Volume)
+    - [Persistence Volume](#Persistence-Volume)
 
 
 # 서비스 시나리오
