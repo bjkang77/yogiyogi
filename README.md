@@ -111,7 +111,7 @@ mvn spring-boot:run
 
 ## DDD 의 적용
 
-- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다.
+- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다. 
 
 ```
 package yanolza;
@@ -177,14 +177,14 @@ public interface PaymentHistoryRepository extends PagingAndSortingRepository<Pay
 ```
 - 적용 후 REST API 의 테스트
 ```
-# app 서비스의 주문처리
-http localhost:8081/orders hotelId=4001 roomType=delux
+# order 서비스의 주문처리
+http localhost:8081/orders name="KimGangMin" cardNo=0 status="order started"
 
-# pay 서비스의 결제처리
-http localhost:8083/payments orderId=3 payMethod=card price=100000
+# payment 서비스의 결제처리
+http localhost:8088/paymentHistories orderId=1 cardNo=0000
 
-# hotel 서비스의 예약처리
-http localhost:8082/reservations orderId=3 status="confirmed"
+# reservation 서비스의 예약처리
+http localhost:8088/reservations orderId=3 status="confirmed"
 
 # 주문 상태 확인
 http localhost:8081/orders/3
@@ -211,11 +211,11 @@ Polyglot Persistence를 위해 h2datase를 hsqldb로 변경
 -->
 
 # 변경/재기동 후 예약 주문
-http localhost:8081/orders hotelId=2001 roomType=standard
+http localhost:8081/orders name="lee" cardNo=1 status="order started"
 
 HTTP/1.1 201 
 Content-Type: application/json;charset=UTF-8
-Date: Mon, 22 Feb 2021 06:11:15 GMT
+Date: Wed, 18 Aug 2021 09:41:30 GMT
 Location: http://localhost:8081/orders/1
 Transfer-Encoding: chunked
 
@@ -228,17 +228,18 @@ Transfer-Encoding: chunked
             "href": "http://localhost:8081/orders/1"
         }
     },
-    "hotelId": "2001",
-    "roomType": "standard",
-    "status": null
+    "cardNo": 1,
+    "name": "lee",
+    "status": "order started"
 }
+
 
 # 저장이 잘 되었는지 조회
 http localhost:8081/orders/1
 
-HTTP/1.1 200 
-Content-Type: application/hal+json;charset=UTF-8
-Date: Mon, 22 Feb 2021 06:17:40 GMT
+HTTP/1.1 200
+Content-Type: application/hal+json;charset=UTF-8    
+Date: Wed, 18 Aug 2021 09:42:25 GMT
 Transfer-Encoding: chunked
 
 {
@@ -250,9 +251,9 @@ Transfer-Encoding: chunked
             "href": "http://localhost:8081/orders/1"
         }
     },
-    "hotelId": "2001",
-    "roomType": "standard",
-    "status": null
+    "cardNo": 1,
+    "name": "lee",
+    "status": "order started"
 }
 ```
 
@@ -266,26 +267,23 @@ http localhost:8081/mypages/12
 
 HTTP/1.1 200 
 Content-Type: application/hal+json;charset=UTF-8
-Date: Wed, 24 Feb 2021 00:09:57 GMT
+Date: Wed, 18 Aug 2021 09:46:13 GMT
 Transfer-Encoding: chunked
 
 {
     "_links": {
         "mypage": {
-            "href": "http://localhost:8081/mypages/12"
+            "href": "http://localhost:8084/mypages/2"
         },
         "self": {
-            "href": "http://localhost:8081/mypages/12"
+            "href": "http://localhost:8084/mypages/2"
         }
     },
-    "hotelId": "3001",
-    "orderId": 11,
-    "payMethod": "card",
-    "paymentId": null,
-    "price": 100000,
+    "cancellationId": null,
+    "name": "kim",
+    "orderId": 2,
     "reservationId": 2,
-    "roomType": "suite",
-    "status": "Confirming reservation"
+    "status": "Reservation Complete"
 }
 ```
 
@@ -347,24 +345,52 @@ public interface PaymentHistoryService {
 
 
 ```
-# 결제 (pay) 서비스를 잠시 내려놓음 (ctrl+c)
+# 결제 (payment) 서비스를 잠시 내려놓음 (ctrl+c)
 
-#주문처리
-http localhost:8081/orders item=통닭 storeId=1   #Fail
-http localhost:8081/orders item=피자 storeId=2   #Fail
+# 주문요청
+http http://localhost:8088/orders name="me" cardNo=123 status="Order Start"
+ 
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json;charset=UTF-8
+Date: Wed, 18 Aug 2021 09:52:24 GMT
+transfer-encoding: chunked
 
-#결제서비스 재기동
-cd 결제
+{
+    "error": "Internal Server Error",
+    "message": "Could not commit JPA transaction; nested exception is javax.persistence.RollbackException: Error while committing the transaction",
+    "path": "/orders",
+    "status": 500,
+    "timestamp": "2021-08-18T09:52:24.229+0000"
+}
+
+# 결제 (payment) 재기동
 mvn spring-boot:run
 
 #주문처리
-http localhost:8081/orders item=통닭 storeId=1   #Success
-http localhost:8081/orders item=피자 storeId=2   #Success
+http http://localhost:8088/orders name="me" cardNo=123 status="Order Start"
+
+HTTP/1.1 201 Created
+Content-Type: application/json;charset=UTF-8
+Date: Wed, 18 Aug 2021 09:54:24 GMT
+Location: http://localhost:8081/orders/3    
+transfer-encoding: chunked
+
+{
+    "_links": {
+        "order": {
+            "href": "http://localhost:8081/orders/3"
+        },
+        "self": {
+            "href": "http://localhost:8081/orders/3"
+        }
+    },
+    "cardNo": 123,
+    "name": "me",
+    "status": "Order Start"
+}
 ```
 
 - 또한 과도한 요청시에 서비스 장애가 도미노 처럼 벌어질 수 있다. (서킷브레이커, 폴백 처리는 운영단계에서 설명한다.)
-
-
 
 
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
@@ -375,82 +401,97 @@ http localhost:8081/orders item=피자 storeId=2   #Success
 - 이를 위하여 결제이력에 기록을 남긴 후에 곧바로 결제승인이 되었다는 도메인 이벤트를 카프카로 송출한다(Publish)
  
 ```
-package fooddelivery;
-
-@Entity
-@Table(name="결제이력_table")
-public class 결제이력 {
+package yanolza;
 
  ...
-    @PrePersist
-    public void onPrePersist(){
-        결제승인됨 결제승인됨 = new 결제승인됨();
-        BeanUtils.copyProperties(this, 결제승인됨);
-        결제승인됨.publish();
-    }
+    @PostPersist
+    public void onPostPersist(){
+        PaymentApproved paymentApproved = new PaymentApproved();
+        
+	paymentApproved.setStatus("Pay OK");
+        
+	BeanUtils.copyProperties(this, paymentApproved);
+        paymentApproved.publishAfterCommit();
 
-}
+    }
 ```
 - 상점 서비스에서는 결제승인 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다:
 
 ```
-package fooddelivery;
+package yanolza;
 
 ...
 
 @Service
 public class PolicyHandler{
+    @Autowired ReservationRepository reservationRepository;
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void whenever결제승인됨_주문정보받음(@Payload 결제승인됨 결제승인됨){
+    public void wheneverPaymentApproved_AcceptReserve(@Payload PaymentApproved paymentApproved){
 
-        if(결제승인됨.isMe()){
-            System.out.println("##### listener 주문정보받음 : " + 결제승인됨.toJson());
-            // 주문 정보를 받았으니, 요리를 슬슬 시작해야지..
-            
-        }
+        if(!paymentApproved.validate()) return;
+
+        System.out.println("\n\n##### listener AcceptReserve : " + paymentApproved.toJson() + "\n\n");
+	
+        Reservation reservation = new Reservation();
+        reservation.setStatus("Reservation Complete");
+        reservation.setOrderId(paymentApproved.getOrderId());
+        reservation.setId(paymentApproved.getOrderId());
+        reservationRepository.save(reservation);
+       
+
     }
-
-}
-
-```
-실제 구현을 하자면, 카톡 등으로 점주는 노티를 받고, 요리를 마친후, 주문 상태를 UI에 입력할테니, 우선 주문정보를 DB에 받아놓은 후, 이후 처리는 해당 Aggregate 내에서 하면 되겠다.:
-  
-```
-  @Autowired 주문관리Repository 주문관리Repository;
-  
-  @StreamListener(KafkaProcessor.INPUT)
-  public void whenever결제승인됨_주문정보받음(@Payload 결제승인됨 결제승인됨){
-
-      if(결제승인됨.isMe()){
-          카톡전송(" 주문이 왔어요! : " + 결제승인됨.toString(), 주문.getStoreId());
-
-          주문관리 주문 = new 주문관리();
-          주문.setId(결제승인됨.getOrderId());
-          주문관리Repository.save(주문);
-      }
-  }
-
 ```
 
-상점 시스템은 주문/결제와 완전히 분리되어있으며, 이벤트 수신에 따라 처리되기 때문에, 상점시스템이 유지보수로 인해 잠시 내려간 상태라도 주문을 받는데 문제가 없다:
+예약 시스템은 주문/결제와 완전히 분리되어있으며, 이벤트 수신에 따라 처리되기 때문에, 예약시스템이 유지보수로 인해 잠시 내려간 상태라도 주문을 받는데 문제가 없다:
 ```
-# 상점 서비스 (store) 를 잠시 내려놓음 (ctrl+c)
+# 예약 서비스 (reservation) 를 잠시 내려놓음 (ctrl+c)
 
 #주문처리
-http localhost:8081/orders item=통닭 storeId=1   #Success
-http localhost:8081/orders item=피자 storeId=2   #Success
+http localhost:8081/orders name="ChooChoo" cardNo=27 status="order started"
 
 #주문상태 확인
-http localhost:8080/orders     # 주문상태 안바뀜 확인
+http localhost:8081/orders/3      # 주문정상
 
-#상점 서비스 기동
-cd 상점
+{
+    "_links": {
+        "order": {
+            "href": "http://localhost:8081/orders/3"
+        },
+        "self": {
+            "href": "http://localhost:8081/orders/3"
+        }
+    },
+    "cardNo": 27,
+    "name": "ChooChoo",
+    "status": "order started"
+}
+	    
+#예약 서비스 기동
+cd reservation
 mvn spring-boot:run
 
 #주문상태 확인
-http localhost:8080/orders     # 모든 주문의 상태가 "배송됨"으로 확인
+http localhost:8084/mypages     # 예약 상태가 "Reservation Complete"으로 확인
+
+ {
+                "_links": {
+                    "mypage": {
+                        "href": "http://localhost:8084/mypages/2"
+                    },
+                    "self": {
+                        "href": "http://localhost:8084/mypages/2"
+                    }
+                },
+                "cancellationId": null,
+                "name": "ChoiJung",
+                "orderId": 2,
+                "reservationId": 1,
+                "status": "Reservation Complete"
+            }
 ```
+
+
 
 
 # 운영
