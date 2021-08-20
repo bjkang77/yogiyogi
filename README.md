@@ -635,7 +635,8 @@ kubectl apply -f kubernetes/deployment.yaml
             timeoutSeconds: 2
             periodSeconds: 5
             failureThreshold: 5
-```	    
+```
+
 
 RESTARTS 회수가 증가함.
 
@@ -644,6 +645,12 @@ RESTARTS 회수가 증가함.
 
 ## Persistence Volume
 신규로 생성한 EFS Storage에 Pod가 접근할 수 있도록 권한 및 서비스 설정.
+
+1. EFS 생성: ClusterSharedNodeSecurityGroup 선택
+   (efs01.png 추가)
+
+2. EFS 생성: ClusterSharedNodeSecurityGroup 선택
+2. 
 
 - df-k로 EFS에 접근 가능
 
