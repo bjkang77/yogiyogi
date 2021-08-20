@@ -660,9 +660,9 @@ kubectl get ServiceAccount efs-provisioner -n yanolza
 kubectl apply -f efs-rbac.yaml
 
 # efs-provisioner-deploy.yml 파일 수정
-value: fs-3dff735d
+value: fs-3ddc505d
 value: ap-northeast-2
-server: fs-3dff735d.efs.ap-northeast-2.amazonaws.com
+server: fs-3ddc505d.efs.ap-northeast-2.amazonaws.com
 ```
 
 3. EFS provisioner 설치
