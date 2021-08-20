@@ -545,8 +545,12 @@ spec:
 
 ```
 
+- istio-injection 활성화
 
-- istio-injection 활성화 (CB_setting.jpg 추가) (CB_apply.jpg 추가)
+![CB_setting](https://user-images.githubusercontent.com/3106233/130160176-c4905961-5a64-43d5-b925-ce7fabe82142.jpg)
+
+![CB_apply](https://user-images.githubusercontent.com/3106233/130160091-07a3ff17-5fd5-4175-b9e2-c2215b77a802.jpg)
+
 ```
 kubectl label namespace default istio-injection=enabled 
 
@@ -566,11 +570,13 @@ kube-public       Active   109m
 kube-system       Active   109m
 ```
 
+- 1명이 10초간 부하 발생하여 100% 정상처리 확인
 
-- 1명이 10초간 부하 발생하여 100% 정상처리 확인(CB_load_st_be.jpg 추가)
+![CB_load_st_be](https://user-images.githubusercontent.com/3106233/130160213-a083edb3-b40b-4626-8f0d-5c5ff1956cba.jpg)
+
 ```
 siege -c1 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
-
+```
 
 root@siege-c54d6bdc7-xc85x:/# siege -c1 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
 ** SIEGE 4.0.4
@@ -583,7 +589,6 @@ HTTP/1.1 201     0.02 secs:     213 bytes ==> POST http://order:8080/orders
 HTTP/1.1 201     0.02 secs:     213 bytes ==> POST http://order:8080/orders
 HTTP/1.1 201     0.02 secs:     213 bytes ==> POST http://order:8080/orders
 ...
-
 
 Lifting the server siege...
 Transactions:                    405 hits
@@ -600,7 +605,10 @@ Longest transaction:            0.08
 Shortest transaction:           0.01
 ```
 
-- 10명이 10초간 부하 발생하여 82.05% 정상처리, 168건 실패 확인(CB_load_rs_af.jpg 추가)
+- 10명이 10초간 부하 발생하여 82.05% 정상처리, 168건 실패 확인
+
+![CB_load_rs_af](https://user-images.githubusercontent.com/3106233/130160265-cc77b0de-1e8a-4713-af89-81011941c93d.jpg)
+
 ```
 siege -c2 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
 
@@ -615,7 +623,6 @@ HTTP/1.1 201     0.02 secs:     215 bytes ==> POST http://order:8080/orders
 HTTP/1.1 201     0.05 secs:     215 bytes ==> POST http://order:8080/orders
 HTTP/1.1 201     0.05 secs:     215 bytes ==> POST http://order:8080/orders
 ...
-
 
 Lifting the server siege...
 Transactions:                    642 hits
@@ -635,25 +642,24 @@ Longest transaction:            0.15
 
 
 
-### 오토스케일 아웃(덕호작성완료)
+### 오토스케일 아웃
 customer(mypage)에 대한 조회증가 시 replica 를 동적으로 늘려주도록 오토스케일아웃을 설정한다.
 
 - autoscaleout_customer.yaml에 resources 설정을 추가한다
-(autoscale_yaml.jpg 삽입)
 
+![autoscale_yaml](https://user-images.githubusercontent.com/3106233/130160306-ca9c2cf7-760e-4d28-841d-730d7061e96b.jpg)
 
 - customer 서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 50프로를 넘어서면 replica 를 10개까지 늘려준다.
-(autoscale_setting.jpg 삽입)
 
+![autoscale_setting](https://user-images.githubusercontent.com/3106233/130160324-7b392a52-cfd5-4125-8d2e-917848fd5d2c.jpg)
 
 - 부하를 동시사용자 100명으로 걸어준다.
-(autoscale_load_st.jpg 삽입)
 
+![autoscale_load_st](https://user-images.githubusercontent.com/3106233/130160336-098b0308-ed06-45a9-9217-f58e3b939a1b.jpg)
 
 - 모니터링 결과 스케일 아웃 정상작동을 확인할 수 있다.
-(autoscale_pod_inc.jpg 삽입)
 
-
+![autoscale_pod_inc](https://user-images.githubusercontent.com/3106233/130160357-ed15e5a3-8b63-4ce8-988f-ac5ea788d042.jpg)
 
 
 ## 무정지 재배포 (Readiness)
