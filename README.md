@@ -549,93 +549,17 @@ spec:
 
 ![CB_apply](https://user-images.githubusercontent.com/3106233/130160091-07a3ff17-5fd5-4175-b9e2-c2215b77a802.jpg)
 
-```
-kubectl label namespace default istio-injection=enabled 
 
-ie98dh@LAPTOP-7QPQK9AV:~/project/yanolza/yanolza-team$ kubectl label namespace default istio-injection=enabled
-namespace/default labeled
-
-
-kubectl get ns -L istio-injection
-
-ie98dh@LAPTOP-7QPQK9AV:~/project/yanolza/yanolza-team$ kubectl get ns -L istio-injection
-NAME              STATUS   AGE    ISTIO-INJECTION
-default           Active   109m   enabled
-istio-system      Active   92m    disabled
-kafka             Active   95m
-kube-node-lease   Active   109m
-kube-public       Active   109m
-kube-system       Active   109m
-```
 
 - 1명이 10초간 부하 발생하여 100% 정상처리 확인
 
 ![CB_load_st_be](https://user-images.githubusercontent.com/3106233/130160213-a083edb3-b40b-4626-8f0d-5c5ff1956cba.jpg)
 
-```
-siege -c1 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
-```
-
-```
-root@siege-c54d6bdc7-xc85x:/# siege -c1 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
-** SIEGE 4.0.4
-** Preparing 1 concurrent users for battle.
-The server is now under siege...
-HTTP/1.1 201     0.04 secs:     213 bytes ==> POST http://order:8080/orders
-HTTP/1.1 201     0.02 secs:     213 bytes ==> POST http://order:8080/orders
-HTTP/1.1 201     0.02 secs:     213 bytes ==> POST http://order:8080/orders
-HTTP/1.1 201     0.02 secs:     213 bytes ==> POST http://order:8080/orders
-HTTP/1.1 201     0.02 secs:     213 bytes ==> POST http://order:8080/orders
-HTTP/1.1 201     0.02 secs:     213 bytes ==> POST http://order:8080/orders
-...
-
-Lifting the server siege...
-Transactions:                    405 hits
-Availability:                 100.00 %
-Elapsed time:                   9.93 secs
-Data transferred:               0.08 MB
-Response time:                  0.02 secs
-Transaction rate:              40.79 trans/sec
-Throughput:                     0.01 MB/sec
-Concurrency:                    0.99
-Successful transactions:         405
-Failed transactions:               0
-Longest transaction:            0.08
-Shortest transaction:           0.01
-```
 
 - 10명이 10초간 부하 발생하여 82.05% 정상처리, 168건 실패 확인
 
 ![CB_load_rs_af](https://user-images.githubusercontent.com/3106233/130160265-cc77b0de-1e8a-4713-af89-81011941c93d.jpg)
 
-```
-siege -c2 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
-
-root@siege-c54d6bdc7-xc85x:/# siege -c2 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
-** SIEGE 4.0.4
-** Preparing 2 concurrent users for battle.
-The server is now under siege...
-HTTP/1.1 503     0.00 secs:      81 bytes ==> POST http://order:8080/orders
-HTTP/1.1 201     0.04 secs:     215 bytes ==> POST http://order:8080/orders
-HTTP/1.1 201     0.05 secs:     215 bytes ==> POST http://order:8080/orders
-HTTP/1.1 201     0.02 secs:     215 bytes ==> POST http://order:8080/orders
-HTTP/1.1 201     0.05 secs:     215 bytes ==> POST http://order:8080/orders
-HTTP/1.1 201     0.05 secs:     215 bytes ==> POST http://order:8080/orders
-...
-
-Lifting the server siege...
-Transactions:                    642 hits
-Availability:                  93.18 %
-Elapsed time:                   9.16 secs
-Data transferred:               0.14 MB
-Response time:                  0.03 secs
-Transaction rate:              70.09 trans/sec
-Throughput:                     0.01 MB/sec
-Concurrency:                    1.97
-Successful transactions:         642
-Failed transactions:              47
-Longest transaction:            0.15
-```
 
 운영시스템은 죽지 않고 지속적으로 CB 에 의하여 적절히 회로가 열림과 닫힘이 벌어지면서 자원을 보호하고 있음을 보여줌.
 
