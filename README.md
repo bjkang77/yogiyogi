@@ -511,10 +511,60 @@ http localhost:8084/mypages     # 예약 상태가 "Reservation Complete"으로 
 
 # 운영
 
-## CI/CD 설정
+## Deploy
 
+사정 설정을 진행한 후
+```
+1) AWS IAM 설정
+2) EKC Cluster 생성	
+3) AWS 클러스터 토큰 가져오기
+4) Docker Start/Login 
+```
+완료된 상태에서 아래 배포 수행
+```
+(1) order build/push
+mvn package
+docker build -t 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-order:v1 .
+aws ecr create-repository --repository-name user03-order --region ap-northeast-2
+docker push 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-order:v1
 
-각 구현체들은 각자의 source repository 에 구성되었고, 사용한 CI/CD 플랫폼은 GCP를 사용하였으며, pipeline build script 는 각 프로젝트 폴더 이하에 cloudbuild.yml 에 포함되었다.
+(2) reservation build/push
+mvn package
+docker build -t 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-reservation:v1 .
+aws ecr create-repository --repository-name user03-reservation --region ap-northeast-2
+docker push 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-reservation:v1
+
+(3) payment build/push
+mvn package
+docker build -t 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-payment:v1 .
+aws ecr create-repository --repository-name user03-payment --region ap-northeast-2
+docker push 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-payment:v1
+
+(4) customer build/push
+mvn package
+docker build -t 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-customer:v1 .
+aws ecr create-repository --repository-name user03-customer --region ap-northeast-2
+docker push 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-customer:v1
+
+(5) gateway build/push
+mvn package
+docker build -t 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-gateway:v1 .
+aws ecr create-repository --repository-name user03-gateway --region ap-northeast-2
+docker push 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-gateway:v1
+
+(6) 배포
+kubectl create deploy order --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-order:v1 -n yanolza
+kubectl create deploy reservation --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-reservation:v1 -n yanolza
+kubectl create deploy payment --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-payment:v1 -n yanolza
+kubectl create deploy customer --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-customer:v1 -n yanolza
+kubectl create deploy gateway --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-gateway:v1 -n yanolza
+
+kubectl expose deploy order --type=ClusterIP --port=8080 -n yanolza
+kubectl expose deploy reservation --type=ClusterIP --port=8080 -n yanolza
+kubectl expose deploy payment --type=ClusterIP --port=8080 -n yanolza
+kubectl expose deploy customer --type=ClusterIP --port=8080 -n yanolza
+kubectl expose deploy gateway --type=LoadBalancer --port=8080 -n yanolza
+```
 
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
