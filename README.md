@@ -565,6 +565,8 @@ kubectl expose deploy payment --type=ClusterIP --port=8080 -n yanolza
 kubectl expose deploy customer --type=ClusterIP --port=8080 -n yanolza
 kubectl expose deploy gateway --type=LoadBalancer --port=8080 -n yanolza
 ```
+Gateway는 LoadBalancer type으로 설정한다.
+![deploy01](https://user-images.githubusercontent.com/87048674/130167640-039e535c-a1de-4089-b7fc-2a6fe60141f5.png)
 
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
