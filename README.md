@@ -513,14 +513,14 @@ http localhost:8084/mypages     # 예약 상태가 "Reservation Complete"으로 
 
 ## Deploy
 
-사정 설정을 진행한 후
+아래와 같은 순서로 AWS 사전 설정을 진행한다.
 ```
 1) AWS IAM 설정
 2) EKC Cluster 생성	
 3) AWS 클러스터 토큰 가져오기
 4) Docker Start/Login 
 ```
-완료된 상태에서 아래 배포 수행
+이후 사전 설정이 완료된 상태에서 아래 배포 수행한다.
 ```
 (1) order build/push
 mvn package
@@ -565,7 +565,7 @@ kubectl expose deploy payment --type=ClusterIP --port=8080 -n yanolza
 kubectl expose deploy customer --type=ClusterIP --port=8080 -n yanolza
 kubectl expose deploy gateway --type=LoadBalancer --port=8080 -n yanolza
 ```
-Gateway는 LoadBalancer type으로 설정한다.
+Gateway는 LoadBalancer type으로 설정하고, 결과는 아래와 같다.
 ![deploy01](https://user-images.githubusercontent.com/87048674/130167640-039e535c-a1de-4089-b7fc-2a6fe60141f5.png)
 
 
