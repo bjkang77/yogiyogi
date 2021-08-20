@@ -1,0 +1,67 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer
+  namespace: yanolza
+  labels:
+    app: customer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: customer
+  template:
+    metadata:
+      labels:
+        app: customer
+    spec:
+      containers:
+        - name: customer
+          image: 721385734927.dkr.ecr.us-east-2.amazonaws.com/dukho-customer:v1
+          args:
+          - /bin/sh
+          - -c
+          - touch /tmp/healthy; sleep 90; rm -rf /tmp/healthy; sleep 600
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            exec:
+              command:
+              - cat
+              - /tmp/healthy
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 5
+#          env:
+#            - name: active.profile
+#              valueFrom:
+#                configMapKeyRef:
+#                  name: yanolza-config
+#                  key: active.profile
+          volumeMounts:
+          - mountPath: "/mnt/aws"
+            name: volume
+      volumes:
+        - name: volume
+          persistentVolumeClaim:
+            claimName: aws-efs
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: customer
+  namespace: yanolza
+  labels:
+    app: customer
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: customer
+
