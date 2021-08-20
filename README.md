@@ -647,11 +647,46 @@ RESTARTS 회수가 증가함.
 신규로 생성한 EFS Storage에 Pod가 접근할 수 있도록 권한 및 서비스 설정.
 
 1. EFS 생성: ClusterSharedNodeSecurityGroup 선택
-   (efs01.png 추가)
+   (efs01~3.png 추가)
 
-2. EFS 생성: ClusterSharedNodeSecurityGroup 선택
-2. 
+2. EFS계정 생성 및 Role 바인딩
+```
+- ServerAccount 생성
+kubectl apply -f efs-sa.yml
+kubectl get ServiceAccount efs-provisioner -n yanolza
 
+
+-SA(efs-provisioner)에 권한(rbac) 설정
+kubectl apply -f efs-rbac.yaml
+
+# efs-provisioner-deploy.yml 파일 수정
+value: fs-3dff735d
+value: ap-northeast-2
+server: fs-3dff735d.efs.ap-northeast-2.amazonaws.com
+```
+
+3. EFS provisioner 설치
+```
+kubectl apply -f efs-provisioner-deploy.yml
+kubectl get Deployment efs-provisioner -n yanolza
+```
+
+4. EFS storageclass 생성
+```
+kubectl apply -f efs-storageclass.yaml
+kubectl get sc aws-efs -n yanolza
+```
+
+5. PVC 생성
+```
+kubectl apply -f volume-pvc.yml
+kubectl get pvc -n yanolza
+```
+
+6. Create Pod with PersistentVolumeClaim
+```
+kubectl apply -f pod-with-pvc.yaml
+```
 - df-k로 EFS에 접근 가능
 
 ![Volume](https://user-images.githubusercontent.com/3106233/130055195-aea654fa-d7df-4df8-9c57-53343f4e06ab.png)
