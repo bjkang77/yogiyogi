@@ -509,8 +509,6 @@ http localhost:8084/mypages     # 예약 상태가 "Reservation Complete"으로 
 ```
 
 
-
-
 # 운영
 
 ## CI/CD 설정
@@ -578,6 +576,7 @@ kube-system       Active   109m
 siege -c1 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
 ```
 
+```
 root@siege-c54d6bdc7-xc85x:/# siege -c1 -t10S -v --content-type "application/json" 'http://order:8080/orders POST {"name": "VIP", "cardNo": "999"}'
 ** SIEGE 4.0.4
 ** Preparing 1 concurrent users for battle.
