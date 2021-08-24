@@ -1,4 +1,4 @@
-# Yanolza
+# Yogiyogi
 
 # 목차
 
