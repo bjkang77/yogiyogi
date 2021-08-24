@@ -25,10 +25,10 @@ spring:
       bindings:
         event-in:
           group: order
-          destination: yanolza
+          destination: yogiyogi
           contentType: application/json
         event-out:
-          destination: yanolza
+          destination: yogiyogi
           contentType: application/json
 
 logging:
@@ -62,10 +62,10 @@ spring:
       bindings:
         event-in:
           group: order
-          destination: yanolza
+          destination: yogiyogi
           contentType: application/json
         event-out:
-          destination: yanolza
+          destination: yogiyogi
           contentType: application/json
 
 api:

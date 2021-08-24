@@ -26,10 +26,10 @@ spring:
       bindings:
         event-in:
           group: payment
-          destination: yanolza
+          destination: yogiyogi
           contentType: application/json
         event-out:
-          destination: yanolza
+          destination: yogiyogi
           contentType: application/json
 
 logging:
@@ -58,8 +58,8 @@ spring:
       bindings:
         event-in:
           group: payment
-          destination: yanolza
+          destination: yogiyogi
           contentType: application/json
         event-out:
-          destination: yanolza
+          destination: yogiyogi
           contentType: application/json

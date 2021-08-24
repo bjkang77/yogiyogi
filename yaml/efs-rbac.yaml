@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: efs-provisioner-runner
-  namespace: yanolza
+  namespace: yogiyogi
 rules:
   - apiGroups: [""]
     resources: ["persistentvolumes"]
@@ -21,11 +21,11 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: run-efs-provisioner
-  namespace: yanolza
+  namespace: yogiyogi
 subjects:
   - kind: ServiceAccount
     name: efs-provisioner
-    namespace: yanolza
+    namespace: yogiyogi
 roleRef:
   kind: ClusterRole
   name: efs-provisioner-runner
@@ -35,7 +35,7 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: leader-locking-efs-provisioner
-  namespace: yanolza
+  namespace: yogiyogi
 rules:
   - apiGroups: [""]
     resources: ["endpoints"]
@@ -45,11 +45,11 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: leader-locking-efs-provisioner
-  namespace: yanolza
+  namespace: yogiyogi
 subjects:
   - kind: ServiceAccount
     name: efs-provisioner
-    namespace: yanolza
+    namespace: yogiyogi
 roleRef:
   kind: Role
   name: leader-locking-efs-provisioner

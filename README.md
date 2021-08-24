@@ -2,7 +2,7 @@
 
 # 목차
 
-- [Yanolza](#---)
+- [yogiyogi](#---)
   - [서비스 시나리오](#서비스-시나리오)
   - [분석 설계](#분석-설계)
   - [구현](#구현)
@@ -22,7 +22,7 @@
 
 # 서비스 시나리오
 
-숙박 예약 시스템인 Yanolza의 기능적, 비기능적 요구사항은 다음과 같습니다. 사용자가 원하는 숙소를 예약한 후 결제를 완료합니다. 담당자는 예약 내역을 확인한 후 확정합니다. 사용자는 예약 현황을 확인할 수 있습니다.
+숙박 예약 시스템인 yogiyogi의 기능적, 비기능적 요구사항은 다음과 같습니다. 사용자가 원하는 숙소를 예약한 후 결제를 완료합니다. 담당자는 예약 내역을 확인한 후 확정합니다. 사용자는 예약 현황을 확인할 수 있습니다.
 
 기능적 요구사항
 
@@ -113,7 +113,7 @@ mvn spring-boot:run
 - 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다. 
 
 ```
-package yanolza;
+package yogiyogi;
 
 import javax.persistence.*;
 import org.springframework.beans.BeanUtils;
@@ -164,7 +164,7 @@ public class PaymentHistory {
 ```
 - Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
 ```
-package yanolza;
+package yogiyogi;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
@@ -318,7 +318,7 @@ Transfer-Encoding: chunked
 ```
 #PaymentHistoryService.java
 
-package yanolza.external;
+package yogiyogi.external;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -349,7 +349,7 @@ public interface PaymentHistoryService {
         //Following code causes dependency to external APIs
         // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
 
-        yanolza.external.PaymentHistory paymentHistory = new yanolza.external.PaymentHistory();
+        yogiyogi.external.PaymentHistory paymentHistory = new yogiyogi.external.PaymentHistory();
         // mappings goes here
         //PaymentHistory payment = new PaymentHistory();
         System.out.println("this.id() : " + this.id);
@@ -358,7 +358,7 @@ public interface PaymentHistoryService {
         paymentHistory.setCardNo(this.cardNo);      
         
         
-        OrderApplication.applicationContext.getBean(yanolza.external.PaymentHistoryService.class)
+        OrderApplication.applicationContext.getBean(yogiyogi.external.PaymentHistoryService.class)
             .pay(paymentHistory);
 ```
 
@@ -422,7 +422,7 @@ transfer-encoding: chunked
 - 이를 위하여 결제이력에 기록을 남긴 후에 곧바로 결제승인이 되었다는 도메인 이벤트를 카프카로 송출한다(Publish)
  
 ```
-package yanolza;
+package yogiyogi;
 
  ...
     @PostPersist
@@ -439,7 +439,7 @@ package yanolza;
 - 예약 서비스에서는 결제승인 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다:
 
 ```
-package yanolza;
+package yogiyogi;
 
 ...
 
@@ -557,17 +557,17 @@ aws ecr create-repository --repository-name user03-gateway --region ap-northeast
 docker push 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-gateway:v1
 
 (6) 배포
-kubectl create deploy order --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-order:v1 -n yanolza
-kubectl create deploy reservation --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-reservation:v1 -n yanolza
-kubectl create deploy payment --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-payment:v1 -n yanolza
-kubectl create deploy customer --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-customer:v1 -n yanolza
-kubectl create deploy gateway --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-gateway:v1 -n yanolza
+kubectl create deploy order --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-order:v1 -n yogiyogi
+kubectl create deploy reservation --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-reservation:v1 -n yogiyogi
+kubectl create deploy payment --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-payment:v1 -n yogiyogi
+kubectl create deploy customer --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-customer:v1 -n yogiyogi
+kubectl create deploy gateway --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-gateway:v1 -n yogiyogi
 
-kubectl expose deploy order --type=ClusterIP --port=8080 -n yanolza
-kubectl expose deploy reservation --type=ClusterIP --port=8080 -n yanolza
-kubectl expose deploy payment --type=ClusterIP --port=8080 -n yanolza
-kubectl expose deploy customer --type=ClusterIP --port=8080 -n yanolza
-kubectl expose deploy gateway --type=LoadBalancer --port=8080 -n yanolza
+kubectl expose deploy order --type=ClusterIP --port=8080 -n yogiyogi
+kubectl expose deploy reservation --type=ClusterIP --port=8080 -n yogiyogi
+kubectl expose deploy payment --type=ClusterIP --port=8080 -n yogiyogi
+kubectl expose deploy customer --type=ClusterIP --port=8080 -n yogiyogi
+kubectl expose deploy gateway --type=LoadBalancer --port=8080 -n yogiyogi
 ```
 Gateway는 LoadBalancer type으로 설정하고, 결과는 아래와 같다.
 ![deploy01](https://user-images.githubusercontent.com/87048674/130167640-039e535c-a1de-4089-b7fc-2a6fe60141f5.png)
@@ -649,7 +649,7 @@ customer(mypage)에 대한 조회증가 시 replica 를 동적으로 늘려주�
 - 새버전으로 배포
 
 ```
-kubectl apply -f /home/jacesky/yanolza-team/kubernetes/deployment_readiness_v1.yml
+kubectl apply -f /home/jacesky/yogiyogi-team/kubernetes/deployment_readiness_v1.yml
 ```
 
 - seige에서  Availability 가 100% 미만으로 떨어졌는지 확인
@@ -711,7 +711,7 @@ RESTARTS 회수가 증가함.
 ```
 - ServerAccount 생성
 kubectl apply -f efs-sa.yml
-kubectl get ServiceAccount efs-provisioner -n yanolza
+kubectl get ServiceAccount efs-provisioner -n yogiyogi
 
 
 -SA(efs-provisioner)에 권한(rbac) 설정
@@ -726,19 +726,19 @@ server: fs-3ddc505d.efs.ap-northeast-2.amazonaws.com
 3. EFS provisioner 설치
 ```
 kubectl apply -f efs-provisioner-deploy.yml
-kubectl get Deployment efs-provisioner -n yanolza
+kubectl get Deployment efs-provisioner -n yogiyogi
 ```
 
 4. EFS storageclass 생성
 ```
 kubectl apply -f efs-storageclass.yaml
-kubectl get sc aws-efs -n yanolza
+kubectl get sc aws-efs -n yogiyogi
 ```
 
 5. PVC 생성
 ```
 kubectl apply -f volume-pvc.yml
-kubectl get pvc -n yanolza
+kubectl get pvc -n yogiyogi
 ```
 
 6. Create Pod with PersistentVolumeClaim
