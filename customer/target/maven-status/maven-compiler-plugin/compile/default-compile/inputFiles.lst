@@ -1,4 +1,5 @@
 D:\Work\yogiyogi\customer\src\main\java\yogiyogi\PaymentApproved.java
+D:\Work\yogiyogi\customer\src\main\java\yogiyogi\ConfirmCanceled.java
 D:\Work\yogiyogi\customer\src\main\java\yogiyogi\OrderCanceled.java
 D:\Work\yogiyogi\customer\src\main\java\yogiyogi\ReserveAccepted.java
 D:\Work\yogiyogi\customer\src\main\java\yogiyogi\MypageViewHandler.java
@@ -8,6 +9,7 @@ D:\Work\yogiyogi\customer\src\main\java\yogiyogi\CustomerApplication.java
 D:\Work\yogiyogi\customer\src\main\java\yogiyogi\Ordered.java
 D:\Work\yogiyogi\customer\src\main\java\yogiyogi\config\kafka\KafkaProcessor.java
 D:\Work\yogiyogi\customer\src\main\java\yogiyogi\PolicyHandler.java
+D:\Work\yogiyogi\customer\src\main\java\yogiyogi\Confirmed.java
 D:\Work\yogiyogi\customer\src\main\java\yogiyogi\Mypage.java
 D:\Work\yogiyogi\customer\src\main\java\yogiyogi\PaymentCanceled.java
 D:\Work\yogiyogi\customer\src\main\java\yogiyogi\ReserveCanceled.java

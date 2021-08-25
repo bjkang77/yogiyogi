@@ -7,6 +7,7 @@ D:\Work\yogiyogi\reservation\src\main\java\yogiyogi\ReserveCanceled.java
 D:\Work\yogiyogi\reservation\src\main\java\yogiyogi\OrderCanceled.java
 D:\Work\yogiyogi\reservation\src\main\java\yogiyogi\ReserveAccepted.java
 D:\Work\yogiyogi\reservation\src\main\java\yogiyogi\CancellationRepository.java
+D:\Work\yogiyogi\reservation\src\main\java\yogiyogi\ConfirmCanceled.java
 D:\Work\yogiyogi\reservation\src\main\java\yogiyogi\PaymentApproved.java
 D:\Work\yogiyogi\reservation\src\main\java\yogiyogi\ReservationApplication.java
 D:\Work\yogiyogi\reservation\src\main\java\yogiyogi\AbstractEvent.java

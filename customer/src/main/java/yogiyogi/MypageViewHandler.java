@@ -130,6 +130,41 @@ public class MypageViewHandler {
             e.printStackTrace();
         }
     }
+    @StreamListener(KafkaProcessor.INPUT)
+    public void whenConfirmed_then_UPDATE_6(@Payload Confirmed confirmed) {
+        try {
+            if (!confirmed.validate()) return;
+                // view 객체 조회
 
+                    List<Mypage> mypageList = mypageRepository.findByOrderId(confirmed.getOrderid());
+                    for(Mypage mypage : mypageList){
+                    // view 객체에 이벤트의 eventDirectValue 를 set 함
+                    mypage.setStatus(confirmed.getStatus());
+                // view 레파지 토리에 save
+                mypageRepository.save(mypage);
+                }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    @StreamListener(KafkaProcessor.INPUT)
+    public void whenConfirmCanceled_then_UPDATE_7(@Payload ConfirmCanceled confirmCanceled) {
+        try {
+            if (!confirmCanceled.validate()) return;
+                // view 객체 조회
+
+                    List<Mypage> mypageList = mypageRepository.findByOrderId(confirmCanceled.getOrderid());
+                    for(Mypage mypage : mypageList){
+                    // view 객체에 이벤트의 eventDirectValue 를 set 함
+                    mypage.setStatus(confirmCanceled.getStatus());
+                // view 레파지 토리에 save
+                mypageRepository.save(mypage);
+                }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }
 

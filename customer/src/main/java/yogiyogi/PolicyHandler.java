@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 public class PolicyHandler{
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverReserveAccepted_SendSms(@Payload ReserveAccepted reserveAccepted){
+    public void wheneverConfirmed_SendSms(@Payload Confirmed confirmed){
 
-        if(!reserveAccepted.validate()) return;
+        if(!confirmed.validate()) return;
 
-        System.out.println("\n\n##### listener SendSms : " + reserveAccepted.toJson() + "\n\n");
+        System.out.println("\n\n##### listener SendSms : " + confirmed.toJson() + "\n\n");
 
 
 

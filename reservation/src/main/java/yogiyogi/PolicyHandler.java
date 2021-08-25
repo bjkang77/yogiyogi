@@ -54,7 +54,24 @@ public class PolicyHandler{
         cancellationRepository.save(cancellation);
 
     }
+    @StreamListener(KafkaProcessor.INPUT)
+    public void wheneverConfirmCanceled_CancelReserve(@Payload ConfirmCanceled confirmCanceled){
 
+        if(!confirmCanceled.validate()) return;
+
+        System.out.println("\n\n##### listener CancelReserve : " + confirmCanceled.toJson() + "\n\n");
+
+
+
+        // Sample Logic //
+        // Reservation reservation = new Reservation();
+        // reservationRepository.save(reservation);
+        Cancellation cancellation = new Cancellation();
+        cancellation.setOrderId(confirmCanceled.getOrderid());
+        cancellation.setStatus("Confirmation Canceled");
+        cancellationRepository.save(cancellation);
+
+    }
 
     @StreamListener(KafkaProcessor.INPUT)
     public void whatever(@Payload String eventString){}

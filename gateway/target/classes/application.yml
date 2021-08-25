@@ -24,6 +24,10 @@ spring:
           uri: http://localhost:8084
           predicates:
             - Path= /mypages/**
+        - id: hotel
+          uri: http://localhost:8085
+          predicates:
+            - Path= /confirmations/**,/hotelViews/**
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -54,11 +58,15 @@ spring:
         - id: reservation
           uri: http://reservation:8080
           predicates:
-            - Path=/reservations/**/cancellations/** 
+            - Path=/reservations/** 
         - id: customer
           uri: http://customer:8080
           predicates:
             - Path= /mypages/**
+        - id: hotel
+          uri: http://hotel:8080
+          predicates:
+            - Path= /confirmations/**,/hotelViews/**
       globalcors:
         corsConfigurations:
           '[/**]':
