@@ -50,19 +50,19 @@
 
 - Actor, Command 부착
 
-![슬라이드3](https://user-images.githubusercontent.com/3106233/129735198-642b10b0-86b4-49c3-b608-ad3a4dec4914.PNG)
+![Event1](https://user-images.githubusercontent.com/87048664/130746213-62423c0e-55ac-4458-88b9-c7b23b6db9db.png)
 
 - Policy 부착
 
-![슬라이드4](https://user-images.githubusercontent.com/3106233/129735339-6fa82c18-44b5-452c-9c67-1728e1a4c115.PNG)
+![Event2](https://user-images.githubusercontent.com/87048664/130746296-669cc227-44d0-4b70-8d27-62d0715755c8.png)
 
 - Aggregate 부착
 
-![슬라이드5](https://user-images.githubusercontent.com/3106233/129735390-8eaeea8a-c8ba-41c7-9694-929fb1ae0a93.PNG)
+![Event3](https://user-images.githubusercontent.com/87048664/130746338-582e0860-b9d8-43ee-8fa4-ca289cd4933c.png)
 
 - View 추가 및 Bounded Context 묶기
 
-![슬라이드6](https://user-images.githubusercontent.com/3106233/129735417-a92fb162-6a6e-48aa-a57f-c5f94da2f3e0.PNG)
+![Event4](https://user-images.githubusercontent.com/87048664/130746394-8df87112-233c-48e1-8069-5b5de6ba7117.png)
 
 - 완성 모형: Pub/Sub, Req/Res 추가
 
