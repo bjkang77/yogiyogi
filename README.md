@@ -6,7 +6,7 @@
   - [서비스 시나리오](#서비스-시나리오)
   - [분석 설계](#분석-설계)
   - [구현](#구현)
-    - [DDD 의 적용](#ddd의-적용)
+    - [DDD 의 적용](#DDD-의-적용)
     - [Polyglot Persistence](#Polyglot-Persistence)
     - [CQRS](#CQRS)
     - [동기식 호출 과 Fallback 처리](#동기식-호출-과-Fallback-처리)
