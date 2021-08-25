@@ -66,7 +66,7 @@
 
 - 완성 모형: Pub/Sub, Req/Res 추가
 
-![슬라이드7](https://user-images.githubusercontent.com/3106233/129735454-4ccf11b6-735e-44a5-9f8b-eb1af5852632.PNG)
+![Event5](https://user-images.githubusercontent.com/87048664/130747113-3e0a1f43-04f8-4a2b-9528-e439cb029a52.png)
 
 기능적 요구사항 커버 여부 검증
 
