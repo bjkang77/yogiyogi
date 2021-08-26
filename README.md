@@ -321,7 +321,7 @@ Transfer-Encoding: chunked
 - 결제서비스를 호출하기 위하여 Stub과 (FeignClient) 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
 
 ```
-#PaymentHistoryService.java
+# ( order )PaymentHistoryService.java
 
 package yogiyogi.external;
 
@@ -333,12 +333,26 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Date;
 
-@FeignClient(name="payment", url="${api.payment.url}")
+@FeignClient(name="payment", url="${api.payment.url}", fallback = PaymentHistoryServiceFallback.class)
 public interface PaymentHistoryService {
     @RequestMapping(method= RequestMethod.POST, path="/paymentHistories")
     public void pay(@RequestBody PaymentHistory paymentHistory);
 
 }
+
+# ( order )PaymentHistoryServiceFallback.java
+
+package yogiyogi.external;
+
+public class PaymentHistoryServiceFallback implements PaymentHistoryService {
+    @Override
+    public void pay(PaymentHistory paymentHistory)
+    {
+        System.out.println("Circuit breaker has been opened. Fallback returned instead.");
+    }
+
+}
+
 ```
 
 - 주문을 받은 직후(@PostPersist) 결제를 요청하도록 처리
