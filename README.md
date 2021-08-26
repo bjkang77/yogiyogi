@@ -94,7 +94,7 @@
 
 
 # 구현
-4개의 Microservice를 Springboot로 구현했으며, 다음과 같이 실행해 Local test를 진행했다. Port number는 8081~8084이다.
+4개의 Microservice를 Springboot로 구현했으며, 다음과 같이 실행해 Local test를 진행했다. Port number는 8081~8085이다.
 
 ```
 cd customer
@@ -107,6 +107,9 @@ cd payment
 mvn spring-boot:run
 
 cd reservation
+mvn spring-boot:run
+
+cd hotel
 mvn spring-boot:run
 ```
 
