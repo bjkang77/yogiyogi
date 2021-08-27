@@ -230,11 +230,11 @@ Polyglot Persistence를 위해 h2datase를 hsqldb로 변경
 -->
 
 # 변경/재기동 후 예약 주문
-http localhost:8081/orders name="lee" cardNo=1 status="order started"
+http localhost:8081/orders name="Kang" cardNo=1 status="order started"
 
 HTTP/1.1 201 
 Content-Type: application/json;charset=UTF-8
-Date: Wed, 18 Aug 2021 09:41:30 GMT
+Date: Thu, 2 Sep 2021 09:41:30 GMT
 Location: http://localhost:8081/orders/1
 Transfer-Encoding: chunked
 
@@ -258,7 +258,7 @@ http localhost:8081/orders/1
 
 HTTP/1.1 200
 Content-Type: application/hal+json;charset=UTF-8    
-Date: Wed, 18 Aug 2021 09:42:25 GMT
+Date: Thu, 2 Sep 2021 09:42:25 GMT
 Transfer-Encoding: chunked
 
 {
