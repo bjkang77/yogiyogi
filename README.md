@@ -205,7 +205,7 @@ Transfer-Encoding: chunked
     },
     "cardNo": 111,
     "name": "BJ.Kang",
-    "status": "Confirmed"
+    "status": "order start"
 }
 
 ```
