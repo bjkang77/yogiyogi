@@ -360,45 +360,46 @@ public class PaymentHistoryServiceFallback implements PaymentHistoryService {
 # 결제 (payment) 서비스를 잠시 내려놓음 (ctrl+c)
 
 # 주문요청
-http http://localhost:8088/orders name="me" cardNo=123 status="Order Start"
- 
-HTTP/1.1 500 Internal Server Error
+http localhost:8081/orders name="aaa" cardNo=111 status="order start"
+
+HTTP/1.1 500
+Connection: close
 Content-Type: application/json;charset=UTF-8
-Date: Wed, 18 Aug 2021 09:52:24 GMT
-transfer-encoding: chunked
+Date: Thu, 2 Sep 2021 06:14:53 GMT
+Transfer-Encoding: chunked
 
 {
     "error": "Internal Server Error",
     "message": "Could not commit JPA transaction; nested exception is javax.persistence.RollbackException: Error while committing the transaction",
     "path": "/orders",
     "status": 500,
-    "timestamp": "2021-08-18T09:52:24.229+0000"
+    "timestamp": "2021-09-02T06:14:53.402+0000"
 }
 
 # 결제 (payment) 재기동
 mvn spring-boot:run
 
 #주문처리
-http http://localhost:8088/orders name="me" cardNo=123 status="Order Start"
+http localhost:8081/orders name="aaa" cardNo=111 status="order start"
 
-HTTP/1.1 201 Created
+HTTP/1.1 201
 Content-Type: application/json;charset=UTF-8
-Date: Wed, 18 Aug 2021 09:54:24 GMT
-Location: http://localhost:8081/orders/3    
-transfer-encoding: chunked
+Date: Thu, 2 Sep 2021 06:18:04 GMT
+Location: http://localhost:8081/orders/5
+Transfer-Encoding: chunked
 
 {
     "_links": {
         "order": {
-            "href": "http://localhost:8081/orders/3"
+            "href": "http://localhost:8081/orders/5"
         },
         "self": {
-            "href": "http://localhost:8081/orders/3"
+            "href": "http://localhost:8081/orders/5"
         }
     },
-    "cardNo": 123,
-    "name": "me",
-    "status": "Order Start"
+    "cardNo": 111,
+    "name": "aaa",
+    "status": "order start"
 }
 ```
 
