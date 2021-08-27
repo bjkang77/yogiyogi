@@ -280,13 +280,12 @@ Transfer-Encoding: chunked
 
 CQRS 구현을 위해 고객의 예약 상황을 확인할 수 있는 Mypage 와 숙소 운영자가 예약 상황을 확인할 수 있는 HotelView 를 구현.
 
-```
 # mypage 호출 
 ![CQRS1](https://user-images.githubusercontent.com/87048664/131078760-77e6bd98-bca8-46c0-aa1a-b8e2289e4382.png)
 
 # hotelview 호출 
 ![CQRS2](https://user-images.githubusercontent.com/87048664/131078834-35b07402-8d6c-4a67-a9af-86df88611ccd.png)
-```
+
 ## 동기식 호출 과 Fallback 처리
 
 주문(Order)->결제(Payment) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다.
