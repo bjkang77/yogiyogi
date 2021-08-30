@@ -6,7 +6,7 @@
   - [서비스 시나리오](#서비스-시나리오)
   - [분석 설계](#분석-설계)
   - [구현](#구현)
-    - [DDD 의 적용](#ddd의-적용)
+    - [DDD 의 적용](#DDD-의-적용)
     - [Polyglot Persistence](#Polyglot-Persistence)
     - [CQRS](#CQRS)
     - [동기식 호출 과 Fallback 처리](#동기식-호출-과-Fallback-처리)
@@ -29,9 +29,10 @@
 1. 사용자는 원하는 숙소를 예약한다.
 2. 사용자가 결제를 완료하면 예약이 완료된다.
 3. 사용자가 결제를 완료하지 못하면 예약이 취소된다.
-4. 예약이 완료되면 담당자는 예약 내역을 확인하고 확정한다.
-5. 사용자는 예약 현황을 조회할 수 있다.
-6. 사용자는 중간에 예약을 취소할 수 있으며, 해당 예약은 삭제된다.
+4. 예약이 완료되면 숙소 운영자는 예약 내역을 확인하고 확정하거나 취소한다.
+5. 숙소 운영자는 예약 현황을 조회할수 있다.
+6. 사용자는 예약 현황을 조회할 수 있다.
+7. 사용자는 중간에 예약을 취소할 수 있으며, 해당 예약은 삭제된다.
 
 비기능적 요구사항
 
@@ -45,36 +46,37 @@
 - MSAEZ에서 Event Storming 수행
 - Event 도출
 
-![슬라이드2](https://user-images.githubusercontent.com/3106233/129735109-d44a14a2-987d-4c76-982e-556bd16d1cf4.PNG)
+![Event](https://user-images.githubusercontent.com/87048664/130742436-e279662e-b455-4034-82fe-affe80e4b82d.png)
 
 - Actor, Command 부착
 
-![슬라이드3](https://user-images.githubusercontent.com/3106233/129735198-642b10b0-86b4-49c3-b608-ad3a4dec4914.PNG)
+![Event1](https://user-images.githubusercontent.com/87048664/130746213-62423c0e-55ac-4458-88b9-c7b23b6db9db.png)
 
 - Policy 부착
 
-![슬라이드4](https://user-images.githubusercontent.com/3106233/129735339-6fa82c18-44b5-452c-9c67-1728e1a4c115.PNG)
+![Event2](https://user-images.githubusercontent.com/87048664/130746296-669cc227-44d0-4b70-8d27-62d0715755c8.png)
 
 - Aggregate 부착
 
-![슬라이드5](https://user-images.githubusercontent.com/3106233/129735390-8eaeea8a-c8ba-41c7-9694-929fb1ae0a93.PNG)
+![Event3](https://user-images.githubusercontent.com/87048664/130746338-582e0860-b9d8-43ee-8fa4-ca289cd4933c.png)
 
 - View 추가 및 Bounded Context 묶기
 
-![슬라이드6](https://user-images.githubusercontent.com/3106233/129735417-a92fb162-6a6e-48aa-a57f-c5f94da2f3e0.PNG)
+![Event4](https://user-images.githubusercontent.com/87048664/130746394-8df87112-233c-48e1-8069-5b5de6ba7117.png)
 
 - 완성 모형: Pub/Sub, Req/Res 추가
 
-![슬라이드7](https://user-images.githubusercontent.com/3106233/129735454-4ccf11b6-735e-44a5-9f8b-eb1af5852632.PNG)
+![Event5](https://user-images.githubusercontent.com/87048664/130747113-3e0a1f43-04f8-4a2b-9528-e439cb029a52.png)
 
 기능적 요구사항 커버 여부 검증
 
 1. 사용자는 원하는 숙소를 예약한다. (O)
 2. 사용자가 결제를 완료하면 예약이 완료된다. (O)
 3. 사용자가 결제를 완료하지 못하면 예약이 취소된다. (O)
-4. 예약이 완료되면 담당자는 내역을 확인하고 확정한다. (O)
-5. 사용자는 예약 현황을 조회할 수 있다. (O)
-6. 사용자는 중간에 예약을 취소할 수 있으며, 해당 예약은 삭제된다. (O)
+4. 예약이 완료되면 숙소 운영자는 예약 내역을 확인하고 확정하거나 취소한다. (O)
+5. 숙소 운영자는 예약 현황을 조회할수 있다. (O)
+6. 사용자는 예약 현황을 조회할 수 있다. (O)
+7. 사용자는 중간에 예약을 취소할 수 있으며, 해당 예약은 삭제된다. (O)
 
 비기능적 요구사항 커버 여부 검증
 
@@ -84,7 +86,7 @@
 
 ## Hexagonal Architecture Diagram
 
-![슬라이드8](https://user-images.githubusercontent.com/3106233/129735687-d54b9e92-1259-4d6b-8cd0-a4a45b1fc543.PNG)
+![Hexagonal](https://user-images.githubusercontent.com/87048664/130757136-4a29459c-8164-4885-af5c-17024376301f.png)
 
 - Inbound adaptor와 Outbound adaptor를 구분함
 - 호출관계에서 PubSub 과 Req/Resp 를 구분함
@@ -92,7 +94,7 @@
 
 
 # 구현
-4개의 Microservice를 Springboot로 구현했으며, 다음과 같이 실행해 Local test를 진행했다. Port number는 8081~8084이다.
+5개의 Microservice를 Springboot로 구현했으며, 다음과 같이 실행해 Local test를 진행했다. Port number는 8081~8085이다.
 
 ```
 cd customer
@@ -105,6 +107,9 @@ cd payment
 mvn spring-boot:run
 
 cd reservation
+mvn spring-boot:run
+
+cd hotel
 mvn spring-boot:run
 ```
 
@@ -177,19 +182,16 @@ public interface PaymentHistoryRepository extends PagingAndSortingRepository<Pay
 - 적용 후 REST API 의 테스트
 ```
 # order 서비스의 주문처리
-http localhost:8081/orders name="KimGM" cardNo=0 status="order start"
+http localhost:8081/orders name="BJ.Kang" cardNo=111 status="order start"
 
-# payment 서비스의 결제처리
-http localhost:8088/paymentHistories orderId=1 cardNo=0000
-
-# reservation 서비스의 예약처리
-http localhost:8088/reservations orderId=1 status="confirmed"
+# hotel 서비스의 예약 확정 처리
+http localhost:8085/confirmations orderid=1 status="Confirmed"
 
 # 주문 상태 확인    
 http localhost:8081/orders/1
 HTTP/1.1 200
 Content-Type: application/hal+json;charset=UTF-8
-Date: Thu, 19 Aug 2021 02:05:39 GMT
+Date: Thu, 2 Sep 2021 02:05:39 GMT
 Transfer-Encoding: chunked
 
 {
@@ -201,8 +203,8 @@ Transfer-Encoding: chunked
             "href": "http://localhost:8081/orders/1"
         }
     },
-    "cardNo": 0,
-    "name": "KimGM",
+    "cardNo": 111,
+    "name": "BJ.Kang",
     "status": "order start"
 }
 
@@ -228,11 +230,11 @@ Polyglot Persistence를 위해 h2datase를 hsqldb로 변경
 -->
 
 # 변경/재기동 후 예약 주문
-http localhost:8081/orders name="lee" cardNo=1 status="order started"
+http localhost:8081/orders name="Kang" cardNo=1 status="order started"
 
 HTTP/1.1 201 
 Content-Type: application/json;charset=UTF-8
-Date: Wed, 18 Aug 2021 09:41:30 GMT
+Date: Thu, 2 Sep 2021 07:41:30 GMT
 Location: http://localhost:8081/orders/1
 Transfer-Encoding: chunked
 
@@ -246,7 +248,7 @@ Transfer-Encoding: chunked
         }
     },
     "cardNo": 1,
-    "name": "lee",
+    "name": "Kang",
     "status": "order started"
 }
 
@@ -256,7 +258,7 @@ http localhost:8081/orders/1
 
 HTTP/1.1 200
 Content-Type: application/hal+json;charset=UTF-8    
-Date: Wed, 18 Aug 2021 09:42:25 GMT
+Date: Thu, 2 Sep 2021 07:42:25 GMT
 Transfer-Encoding: chunked
 
 {
@@ -269,45 +271,20 @@ Transfer-Encoding: chunked
         }
     },
     "cardNo": 1,
-    "name": "lee",
+    "name": "Kang",
     "status": "order started"
 }
 ```
 
 ## CQRS
 
-CQRS 구현을 위해 고객의 예약 상황을 확인할 수 있는 Mypage를 구성.
+CQRS 구현을 위해 고객의 예약 상황을 확인할 수 있는 Mypage 와 숙소 운영자가 예약 상황을 확인할 수 있는 HotelView 를 구현.
 
-```
-# mypage 호출 
-http localhost:8081/mypages/12
+### mypage 호출 
+![CQRS1](https://user-images.githubusercontent.com/87048664/131078760-77e6bd98-bca8-46c0-aa1a-b8e2289e4382.png)
 
-HTTP/1.1 200 
-Content-Type: application/hal+json;charset=UTF-8
-Date: Wed, 18 Aug 2021 09:46:13 GMT
-Transfer-Encoding: chunked
-
-{
-    "_links": {
-        "mypage": {
-            "href": "http://localhost:8084/mypages/2"
-        },
-        "self": {
-            "href": "http://localhost:8084/mypages/2"
-        }
-    },
-    "cancellationId": null,
-    "name": "kim",
-    "orderId": 2,
-    "reservationId": 2,
-    "status": "Reservation Complete"
-}
-```
-
-![order 1](https://user-images.githubusercontent.com/3106233/130169827-fe96f448-5523-4403-a1c5-be06a19c75f6.png)
-
-![order 2](https://user-images.githubusercontent.com/3106233/130169723-c70ec011-2106-46f2-a67e-d48af01757f1.png)
-
+### hotelview 호출 
+![CQRS2](https://user-images.githubusercontent.com/87048664/131078834-35b07402-8d6c-4a67-a9af-86df88611ccd.png)
 
 ## 동기식 호출 과 Fallback 처리
 
@@ -316,7 +293,7 @@ Transfer-Encoding: chunked
 - 결제서비스를 호출하기 위하여 Stub과 (FeignClient) 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
 
 ```
-#PaymentHistoryService.java
+# ( order )PaymentHistoryService.java
 
 package yogiyogi.external;
 
@@ -328,12 +305,26 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Date;
 
-@FeignClient(name="payment", url="${api.payment.url}")
+@FeignClient(name="payment", url="${api.payment.url}", fallback = PaymentHistoryServiceFallback.class)
 public interface PaymentHistoryService {
     @RequestMapping(method= RequestMethod.POST, path="/paymentHistories")
     public void pay(@RequestBody PaymentHistory paymentHistory);
 
 }
+
+# ( order )PaymentHistoryServiceFallback.java
+
+package yogiyogi.external;
+
+public class PaymentHistoryServiceFallback implements PaymentHistoryService {
+    @Override
+    public void pay(PaymentHistory paymentHistory)
+    {
+        System.out.println("Circuit breaker has been opened. Fallback returned instead.");
+    }
+
+}
+
 ```
 
 - 주문을 받은 직후(@PostPersist) 결제를 요청하도록 처리
@@ -369,45 +360,46 @@ public interface PaymentHistoryService {
 # 결제 (payment) 서비스를 잠시 내려놓음 (ctrl+c)
 
 # 주문요청
-http http://localhost:8088/orders name="me" cardNo=123 status="Order Start"
- 
-HTTP/1.1 500 Internal Server Error
+http localhost:8081/orders name="aaa" cardNo=111 status="order start"
+
+HTTP/1.1 500
+Connection: close
 Content-Type: application/json;charset=UTF-8
-Date: Wed, 18 Aug 2021 09:52:24 GMT
-transfer-encoding: chunked
+Date: Thu, 2 Sep 2021 06:14:53 GMT
+Transfer-Encoding: chunked
 
 {
     "error": "Internal Server Error",
     "message": "Could not commit JPA transaction; nested exception is javax.persistence.RollbackException: Error while committing the transaction",
     "path": "/orders",
     "status": 500,
-    "timestamp": "2021-08-18T09:52:24.229+0000"
+    "timestamp": "2021-09-02T06:14:53.402+0000"
 }
 
 # 결제 (payment) 재기동
 mvn spring-boot:run
 
 #주문처리
-http http://localhost:8088/orders name="me" cardNo=123 status="Order Start"
+http localhost:8081/orders name="aaa" cardNo=111 status="order start"
 
-HTTP/1.1 201 Created
+HTTP/1.1 201
 Content-Type: application/json;charset=UTF-8
-Date: Wed, 18 Aug 2021 09:54:24 GMT
-Location: http://localhost:8081/orders/3    
-transfer-encoding: chunked
+Date: Thu, 2 Sep 2021 06:18:04 GMT
+Location: http://localhost:8081/orders/5
+Transfer-Encoding: chunked
 
 {
     "_links": {
         "order": {
-            "href": "http://localhost:8081/orders/3"
+            "href": "http://localhost:8081/orders/5"
         },
         "self": {
-            "href": "http://localhost:8081/orders/3"
+            "href": "http://localhost:8081/orders/5"
         }
     },
-    "cardNo": 123,
-    "name": "me",
-    "status": "Order Start"
+    "cardNo": 111,
+    "name": "aaa",
+    "status": "order start"
 }
 ```
 
