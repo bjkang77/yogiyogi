@@ -1,5 +1,6 @@
 server:
   port: 8080
+
 ---
 
 spring:
@@ -42,6 +43,15 @@ api:
   payment:
     url: http://localhost:8082
 
+feign:
+  hystrix:
+    enabled: true
+
+hystrix:
+  command:
+    # 전역설정
+    default:
+      execution.isolation.thread.timeoutInMilliseconds: 610
 ---
 
 spring:
