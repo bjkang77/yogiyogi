@@ -13,7 +13,7 @@
     - [비동기식 호출 과 Eventual Consistency](#비동기식-호출-과-Eventual-Consistency)
   - [운영](#운영)
     - [CI/CD 설정](#cicd설정)
-    - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출-서킷-브레이킹-장애격리)
+    - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출-/-서킷-브레이킹-/-장애격리)
     - [오토스케일 아웃](#오토스케일-아웃)
     - [무정지 재배포](#무정지-재배포)
     - [Liveness](#Liveness)
@@ -609,7 +609,6 @@ hystrix:
 ![CB1](https://user-images.githubusercontent.com/87048664/131446364-2ef12a4d-372d-4e86-8bc1-f2b3271e3c30.png)
 
 * 요청이 과도하여 CB를 동작함 요청을 차단했다가 다시 열리기를 반복함
-
 ![CB2](https://user-images.githubusercontent.com/87048664/131446580-1c4b44f3-350a-449d-90c4-b7c29edbcc97.png)
 ![CB3](https://user-images.githubusercontent.com/87048664/131446670-dc96d3be-d3f4-4583-9280-f161f76be94e.png)
 
