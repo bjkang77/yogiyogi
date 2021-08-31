@@ -667,9 +667,16 @@ kubectl apply -f kubernetes/deployment.yaml
 
 ## Liveness
 
-임의로 Pod의 Health check에 문제를 발생시키고, Liveness Probe가 Pod를 재기동하는지 확인
+임의로 Pod의 Health check에 문제를 발생하도록 customer 서비스의 deployment.yaml 에 설정하고, Liveness Probe가 Pod를 재기동하는지 확인
 
 ```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer
+  labels:
+    app: customer
+	...
           args:
           - /bin/sh
           - -c
@@ -688,9 +695,9 @@ kubectl apply -f kubernetes/deployment.yaml
 ```
 
 
-RESTARTS 회수가 증가함.
+RESTARTS 회수가 증가함을 확인
 
-![Liveness](https://user-images.githubusercontent.com/3106233/130054276-24f98bd4-9481-47e0-bf23-a47ad074fb7f.png)
+![liveness](https://user-images.githubusercontent.com/87048664/131455896-9b1784fa-d288-46a5-b762-b3b464c40847.png)
 
 
 ## Persistence Volume
