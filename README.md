@@ -461,7 +461,7 @@ public class PolicyHandler{
 # 예약 서비스 (reservation) 를 잠시 내려놓음 (ctrl+c)
 
 #주문처리
-http localhost:8081/orders name="ChooChoo" cardNo=27 status="order started"
+http localhost:8081/orders name="Kang" cardNo=27 status="order started"
 
 #주문상태 확인
 http localhost:8081/orders/3      # 주문정상
@@ -476,7 +476,7 @@ http localhost:8081/orders/3      # 주문정상
         }
     },
     "cardNo": 27,
-    "name": "ChooChoo",
+    "name": "Kang",
     "status": "order started"
 }
 	    
@@ -490,15 +490,15 @@ http localhost:8084/mypages     # 예약 상태가 "Reservation Complete"으로 
  {
                 "_links": {
                     "mypage": {
-                        "href": "http://localhost:8084/mypages/2"
+                        "href": "http://localhost:8084/mypages/3"
                     },
                     "self": {
-                        "href": "http://localhost:8084/mypages/2"
+                        "href": "http://localhost:8084/mypages/3"
                     }
                 },
                 "cancellationId": null,
-                "name": "ChoiJung",
-                "orderId": 2,
+                "name": "Kang",
+                "orderId": 3,
                 "reservationId": 1,
                 "status": "Reservation Complete"
             }
