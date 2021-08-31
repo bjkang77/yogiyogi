@@ -569,7 +569,7 @@ Gateway는 LoadBalancer type으로 설정하고, 결과는 아래와 같다.
 
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
 
-시나리오는 주문(order)-->결제(payment) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
+시나리오는 주문(order)-->결제(payment) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB(Circuit Breaker ) 를 통하여 장애격리.
 
 - Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 ```
@@ -608,7 +608,7 @@ hystrix:
 - 60초 동안 실시
 ![CB1](https://user-images.githubusercontent.com/87048664/131446364-2ef12a4d-372d-4e86-8bc1-f2b3271e3c30.png)
 
-* 요청이 과도하여 CB를 동작함 요청을 차단했다가 다시 열리기를 반복함
+* 요청이 과도하여 CB가 동작하여 요청을 차단했다가 다시 열리기를 반복함
 ![CB2](https://user-images.githubusercontent.com/87048664/131446580-1c4b44f3-350a-449d-90c4-b7c29edbcc97.png)
 ![CB3](https://user-images.githubusercontent.com/87048664/131446670-dc96d3be-d3f4-4583-9280-f161f76be94e.png)
 
