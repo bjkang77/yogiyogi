@@ -567,50 +567,53 @@ Gateway는 LoadBalancer type으로 설정하고, 결과는 아래와 같다.
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
-## Circuit Breaker
+* 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
 
-* Circuit Breaker 프레임워크의 선택: istio 사용하여 구현.
+시나리오는 주문(order)-->결제(payment) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
 
-시나리오는 주문(order) → 결제(payment) 시의 연결이 Request/Response 로 연동하여 구현이 되어있고, 주문 요청이 과도할 경우 CB 를 통하여 장애격리.
-
-- DestinationRule 를 생성하여 circuit break 가 발생할 수 있도록 설정 최소 connection pool 설정
+- Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 ```
-# destination-rule.yaml
+# (order) application.yml
 
-apiVersion: networking.istio.io/v1alpha3
-kind: DestinationRule
-metadata:
-  name: order
-spec:
-  host: order
-  trafficPolicy:
-    connectionPool:
-      http:
-        http1MaxPendingRequests: 1
-        maxRequestsPerConnection: 1
+hystrix:
+  command:
+    # 전역설정
+    default:
+      execution.isolation.thread.timeoutInMilliseconds: 610
 
 ```
 
-- istio-injection 활성화
+- 피호출 서비스(payment) 의 임의 부하 처리 - 400 밀리에서 증감 220 밀리 정도 왔다갔다 하게
+```
+# (payment) PaymentHistory.java (Entity)
 
-![CB_setting](https://user-images.githubusercontent.com/3106233/130160176-c4905961-5a64-43d5-b925-ce7fabe82142.jpg)
+    @PostPersist
+    public void onPostPersist(){
+        PaymentApproved paymentApproved = new PaymentApproved();
+        paymentApproved.setStatus("Pay OK");
+        BeanUtils.copyProperties(this, paymentApproved);
+        paymentApproved.publishAfterCommit();
+	
+	//결제이력을 저장한 후 적당한 시간 끌기
+        try {
+            Thread.currentThread().sleep((long) (400 + Math.random() * 220));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+```
 
-![CB_apply](https://user-images.githubusercontent.com/3106233/130160091-07a3ff17-5fd5-4175-b9e2-c2215b77a802.jpg)
+* 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:
+- 동시사용자 100명
+- 60초 동안 실시
+![CB1](https://user-images.githubusercontent.com/87048664/131446364-2ef12a4d-372d-4e86-8bc1-f2b3271e3c30.png)
 
+* 요청이 과도하여 CB를 동작함 요청을 차단했다가 다시 열리기를 반복함
 
+![CB2](https://user-images.githubusercontent.com/87048664/131446580-1c4b44f3-350a-449d-90c4-b7c29edbcc97.png)
+![CB3](https://user-images.githubusercontent.com/87048664/131446670-dc96d3be-d3f4-4583-9280-f161f76be94e.png)
 
-- 1명이 10초간 부하 발생하여 100% 정상처리 확인
-
-![CB_load_st_be](https://user-images.githubusercontent.com/3106233/130160213-a083edb3-b40b-4626-8f0d-5c5ff1956cba.jpg)
-
-
-- 10명이 10초간 부하 발생하여 82.05% 정상처리, 168건 실패 확인
-
-![CB_load_rs_af](https://user-images.githubusercontent.com/3106233/130160265-cc77b0de-1e8a-4713-af89-81011941c93d.jpg)
-
-
-운영시스템은 죽지 않고 지속적으로 CB 에 의하여 적절히 회로가 열림과 닫힘이 벌어지면서 자원을 보호하고 있음을 보여줌.
-
+* 운영시스템은 죽지 않고 지속적으로 CB 에 의하여 적절히 회로가 열림과 닫힘이 벌어지면서 자원을 보호하고 있음을 보여줌. 하지만, 67.29% 가 성공하였고, 33%가 실패했다는 것은 고객 사용성에 있어 좋지 않기 때문에 Auto Scale out (replica의 자동적 추가,HPA) 을 통하여 시스템을 확장 해주는 후속처리가 필요.
 
 
 ### 오토스케일 아웃
