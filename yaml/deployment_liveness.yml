@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: customer
-          image: 721385734927.dkr.ecr.ap-northeast-2.amazonaws.com/jaehong-customer:v1
+          image: 155409331279.dkr.ecr.ap-northeast-2.amazonaws.com/bjkang77-customer:v1
           args:
           - /bin/sh
           - -c
