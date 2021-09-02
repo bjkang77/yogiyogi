@@ -520,50 +520,58 @@ http localhost:8084/mypages     # 예약 상태가 "Reservation Complete"으로 
 ```
 (1) order build/push
 mvn package
-docker build -t 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-order:v1 .
-aws ecr create-repository --repository-name user03-order --region ap-northeast-2
-docker push 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-order:v1
+docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-order:v1 .
+aws ecr create-repository --repository-name user01-order --region ap-northeast-2
+docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-order:v1
 
-(2) reservation build/push
+(2) customer build/push
 mvn package
-docker build -t 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-reservation:v1 .
-aws ecr create-repository --repository-name user03-reservation --region ap-northeast-2
-docker push 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-reservation:v1
+docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-customer:v1 .
+aws ecr create-repository --repository-name user01-customer --region ap-northeast-2
+docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-customer:v1
 
-(3) payment build/push
+(3) gateway build/push
 mvn package
-docker build -t 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-payment:v1 .
-aws ecr create-repository --repository-name user03-payment --region ap-northeast-2
-docker push 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-payment:v1
+docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-gateway:v1 .
+aws ecr create-repository --repository-name user01-gateway --region ap-northeast-2
+docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-gateway:v1
 
-(4) customer build/push
+(4) hotel build/push
 mvn package
-docker build -t 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-customer:v1 .
-aws ecr create-repository --repository-name user03-customer --region ap-northeast-2
-docker push 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-customer:v1
+docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-hotel:v1 .
+aws ecr create-repository --repository-name user01-hotel --region ap-northeast-2
+docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-hotel:v1
 
-(5) gateway build/push
+(5) payment build/push
 mvn package
-docker build -t 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-gateway:v1 .
-aws ecr create-repository --repository-name user03-gateway --region ap-northeast-2
-docker push 879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-gateway:v1
+docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-payment:v1 .
+aws ecr create-repository --repository-name user01-payment --region ap-northeast-2
+docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-payment:v1
 
-(6) 배포
-kubectl create deploy order --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-order:v1 -n yogiyogi
-kubectl create deploy reservation --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-reservation:v1 -n yogiyogi
-kubectl create deploy payment --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-payment:v1 -n yogiyogi
-kubectl create deploy customer --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-customer:v1 -n yogiyogi
-kubectl create deploy gateway --image=879772956301.dkr.ecr.ap-northeast-2.amazonaws.com/user03-gateway:v1 -n yogiyogi
+(6) reservation build/push
+mvn package
+docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-reservation:v1 .
+aws ecr create-repository --repository-name user01-reservation --region ap-northeast-2
+docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-reservation:v1
 
-kubectl expose deploy order --type=ClusterIP --port=8080 -n yogiyogi
-kubectl expose deploy reservation --type=ClusterIP --port=8080 -n yogiyogi
-kubectl expose deploy payment --type=ClusterIP --port=8080 -n yogiyogi
-kubectl expose deploy customer --type=ClusterIP --port=8080 -n yogiyogi
-kubectl expose deploy gateway --type=LoadBalancer --port=8080 -n yogiyogi
+(7) 배포
+kubectl create deploy payment --image=052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-payment:v1
+kubectl create deploy order --image=052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-order:v1
+kubectl create deploy reservation --image=052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-reservation:v1
+kubectl create deploy customer --image=052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-customer:v1
+kubectl create deploy hotel --image=052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-hotel:v1
+kubectl create deploy gateway --image=052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-gateway:v1
+
+kubectl expose deploy order --type=ClusterIP --port=8080
+kubectl expose deploy reservation --type=ClusterIP --port=8080
+kubectl expose deploy payment --type=ClusterIP --port=8080
+kubectl expose deploy customer --type=ClusterIP --port=8080
+kubectl expose deploy gateway --type=LoadBalancer --port=8080
+kubectl expose deploy hotel --type="ClusterIP" --port=8080
 ```
-Gateway는 LoadBalancer type으로 설정하고, 결과는 아래와 같다.
-![deploy01](https://user-images.githubusercontent.com/87048674/130167640-039e535c-a1de-4089-b7fc-2a6fe60141f5.png)
-
+배포 과정은 아래와 같다. Gateway는 LoadBalancer type으로 설정하여 인터넷을 통해 접근 가능하다.
+![deploy](https://user-images.githubusercontent.com/87048664/131771116-6c104701-9dd3-400a-9d29-6a34bbc3a21d.png)
+![deploy2](https://user-images.githubusercontent.com/87048664/131771399-81010b67-6133-4746-a9d4-e69ab816ff59.png)
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
