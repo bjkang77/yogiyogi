@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: hotel
-          image: 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-hotel:latest
+          image: 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-hotel:v1
           ports:
             - containerPort: 8080
           readinessProbe:
