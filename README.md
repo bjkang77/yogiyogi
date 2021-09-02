@@ -662,19 +662,19 @@ spec:
 ## 무정지 재배포 (Readiness)
 
 * 먼저 무정지 재배포가 100% 되는 것인지 확인하기 위해서 Autoscaler 이나 CB 설정을 제거함
-- customer microservice v2 이미지를 생성해 deploy
+
 - 새 터미널에서 seige 로 배포작업 직전에 워크로드를 모니터링 함.
-- 새버전으로 배포
+- Readiness 설정 없는 상태로 재배포
 
 ```
-kubectl apply -f /home/jacesky/yogiyogi-team/kubernetes/deployment_readiness_v1.yml
+kubectl apply -f kubernetes/deployment_no_readiness.yml
 ```
 
 - seige에서  Availability 가 100% 미만으로 떨어졌는지 확인
 
-![Readiness 1](https://user-images.githubusercontent.com/3106233/130053885-2bece799-de7e-44e4-b6eb-f588a0fd37e2.png)
+![readiness1](https://user-images.githubusercontent.com/87048664/131800717-844ace1c-905c-40d8-8970-911a2ea4d06a.png)
 
-배포기간중 Availability 가 평소 100%에서 90%대로 떨어지는 것을 확인. Kubernetes가 신규로 Deploy된 Microservice를 준비 상태로 인식해 서비스 수행했기 때문임.
+재배포 중 "Connection refused" 에러 발생 하는 것을 확인. Kubernetes가 신규로 Deploy된 Microservice를 준비 상태로 인식해 서비스 수행했기 때문임.
 방지를 위해 Readiness Probe 를 설정함:
 
 ```
@@ -686,7 +686,7 @@ kubectl apply -f kubernetes/deployment.yaml
 
 ![Readiness 2](https://user-images.githubusercontent.com/3106233/130053849-49de6039-299a-47fa-adde-dac3e114dab0.png)
 
-배포기간 동안 Availability 가 변화없기 때문에 무정지 재배포가 성공한 것으로 확인됨.
+재배포 시 Availability 가 변화없기 때문에 무정지 재배포가 성공한 것으로 확인됨.
 
 
 ## Liveness
