@@ -17,7 +17,7 @@
     - [오토스케일 아웃](#오토스케일-아웃)
     - [무정지 재배포](#무정지-재배포)
     - [Liveness](#Liveness)
-    - [Persistence Volume](#Persistence-Volume)
+    - [ConfigMap](#ConfigMap)
 
 
 # 서비스 시나리오
@@ -724,52 +724,56 @@ RESTARTS 회수가 증가함을 확인
 ![liveness](https://user-images.githubusercontent.com/87048664/131455896-9b1784fa-d288-46a5-b762-b3b464c40847.png)
 
 
-## Persistence Volume
-신규로 생성한 EFS Storage에 Pod가 접근할 수 있도록 권한 및 서비스 설정.
+## ConfigMap
+주문(Order)->결제(Payment) 구간은 동기식 호출(Req/Res)로 연결되어 있어 Payment 서비스의 URL 이 변경될 경우 유연하게 처리가 가능해야 한다.
+Order 서비스에서 바라보는 Payment 서비스 url 부분을 ConfigMap 사용하여 구현하였다.
 
-1. EFS 생성: ClusterSharedNodeSecurityGroup 선택
-![efs01](https://user-images.githubusercontent.com/87048674/130165815-d22091e6-57a9-444a-ba15-320d44884302.png)
-![efs02](https://user-images.githubusercontent.com/87048674/130166013-1489c1b8-e4eb-4af1-9199-8f66ded06919.png)
-![efs03](https://user-images.githubusercontent.com/87048674/130166020-c091a1f8-c137-45b7-9fc8-4b2f582b7bbe.png)
+```
+# ( order ) PaymentHistoryService.java
 
-2. EFS계정 생성 및 Role 바인딩
-```
-- ServerAccount 생성
-kubectl apply -f efs-sa.yml
-kubectl get ServiceAccount efs-provisioner -n yogiyogi
+package yogiyogi.external;
 
+@FeignClient(name="payment", url="${api.payment.url}", fallback = PaymentHistoryServiceFallback.class)
+public interface PaymentHistoryService {
+    @RequestMapping(method= RequestMethod.POST, path="/paymentHistories")
+    public void pay(@RequestBody PaymentHistory paymentHistory);
 
--SA(efs-provisioner)에 권한(rbac) 설정
-kubectl apply -f efs-rbac.yaml
+}
 
-# efs-provisioner-deploy.yml 파일 수정
-value: fs-3ddc505d
-value: ap-northeast-2
-server: fs-3ddc505d.efs.ap-northeast-2.amazonaws.com
-```
+# ( order ) application.yml
 
-3. EFS provisioner 설치
-```
-kubectl apply -f efs-provisioner-deploy.yml
-kubectl get Deployment efs-provisioner -n yogiyogi
-```
+api:
+  payment:
+    url: ${payment-url}
+    
+# order_configmap.yml
 
-4. EFS storageclass 생성
-```
-kubectl apply -f efs-storageclass.yaml
-kubectl get sc aws-efs -n yogiyogi
-```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-configmap
+  namespace: default
+data:
+  payment-url: payment:8080
 
-5. PVC 생성
-```
-kubectl apply -f volume-pvc.yml
-kubectl get pvc -n yogiyogi
-```
+# ( order ) cm_deploy_order.yml
 
-6. Create Pod with PersistentVolumeClaim
-```
-kubectl apply -f pod-with-pvc.yaml
-```
-- df-k로 EFS에 접근 가능
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order
+...
+    spec:
+      containers:
+        - name: order
+          ...
+          env:
+            - name: PAYMENT-URL
+              valueFrom:
+                configMapKeyRef:
+                  name: order-configmap
+                  key: payment-url
 
-![Volume](https://user-images.githubusercontent.com/3106233/130055195-aea654fa-d7df-4df8-9c57-53343f4e06ab.png)
+```
+![cm1](https://user-images.githubusercontent.com/87048664/131793284-00ddd19e-4f3a-45db-810f-26821e15b520.png)
+![cm2](https://user-images.githubusercontent.com/87048664/131793335-62d6e78b-795b-46d6-963f-e76b9a0a99c3.png)
