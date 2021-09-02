@@ -675,15 +675,12 @@ kubectl apply -f kubernetes/deployment_no_readiness.yml
 ![readiness1](https://user-images.githubusercontent.com/87048664/131800717-844ace1c-905c-40d8-8970-911a2ea4d06a.png)
 
 재배포 중 "Connection refused" 에러 발생 하는 것을 확인. Kubernetes가 신규로 Deploy된 Microservice를 준비 상태로 인식해 서비스 수행했기 때문임.
-방지를 위해 Readiness Probe 를 설정함:
 
+
+- 동일한 시나리오로 readiness probe 설정이 존재하는 deployment.yaml 이용하여 재배포
 ```
-# deployment.yaml 의 readiness probe 의 설정:
 kubectl apply -f kubernetes/deployment.yaml
 ```
-
-- 동일한 시나리오로 재배포 한 후 Availability 확인:
-
 ![Readiness 2](https://user-images.githubusercontent.com/3106233/130053849-49de6039-299a-47fa-adde-dac3e114dab0.png)
 
 재배포 시 Availability 가 변화없기 때문에 무정지 재배포가 성공한 것으로 확인됨.
