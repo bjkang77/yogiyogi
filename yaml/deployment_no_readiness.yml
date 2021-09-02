@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: customer
-          image: 155409331279.dkr.ecr.ap-northeast-2.amazonaws.com/bjkang77-customer:v1          
+          image: 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-customer:v1          
           ports:
             - containerPort: 8080
 
