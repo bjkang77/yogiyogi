@@ -652,7 +652,7 @@ spec:
 - payment 서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려준다.<br/>
 ![autoscale1](https://user-images.githubusercontent.com/87048664/131607595-95bfd0d3-581f-440a-af66-6627ddde252b.png)
 
-- 부하를 동시사용자 100명으로 걸어준다.
+- 부하를 동시사용자 20명으로 걸어준다.
 ![autoscale2](https://user-images.githubusercontent.com/87048664/131607667-f6081d1e-02fb-4077-8da4-b8361b0db7fc.png)
 
 - 모니터링 결과 스케일 아웃 정상작동을 확인할 수 있다.
