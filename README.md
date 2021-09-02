@@ -725,12 +725,11 @@ RESTARTS 회수가 증가함을 확인
 
 
 ## ConfigMap
-주문(Order)->결제(Payment) 구간은 동기식 호출(Req/Res)로 연결되어 있어 Payment 서비스의 URL 이 변경될 경우 유연하게 처리가 가능해야 한다.
+주문(Order)->결제(Payment) 구간은 동기식 호출(Req/Res)로 연결되어 있어 Payment 서비스의 URL 이 변경될 경우 유연하게 처리가 가능해야 한다.<br/>
 Order 서비스에서 바라보는 Payment 서비스 url 부분을 ConfigMap 사용하여 구현하였다.
 
+* ( order ) PaymentHistoryService.java
 ```
-# ( order ) PaymentHistoryService.java
-
 package yogiyogi.external;
 
 @FeignClient(name="payment", url="${api.payment.url}", fallback = PaymentHistoryServiceFallback.class)
@@ -739,15 +738,15 @@ public interface PaymentHistoryService {
     public void pay(@RequestBody PaymentHistory paymentHistory);
 
 }
-
-# ( order ) application.yml
-
+```
+* ( order ) application.yml
+```
 api:
   payment:
     url: ${payment-url}
-    
-# order_configmap.yml
-
+```
+* order_configmap.yml
+```
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -755,9 +754,9 @@ metadata:
   namespace: default
 data:
   payment-url: payment:8080
-
-# ( order ) cm_deploy_order.yml
-
+```
+* ( order ) cm_deploy_order.yml
+```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -775,5 +774,8 @@ metadata:
                   key: payment-url
 
 ```
+* ConfigMap 구성 및 배포
 ![cm1](https://user-images.githubusercontent.com/87048664/131793284-00ddd19e-4f3a-45db-810f-26821e15b520.png)
+
+* 주문 정상 처리 확인
 ![cm2](https://user-images.githubusercontent.com/87048664/131793335-62d6e78b-795b-46d6-963f-e76b9a0a99c3.png)
