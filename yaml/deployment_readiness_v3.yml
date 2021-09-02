@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: customer
-          image: 721385734927.dkr.ecr.us-east-2.amazonaws.com/dukho-customer:v2
+          image: 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-customer:v1
           ports:
             - containerPort: 8080
           readinessProbe:
