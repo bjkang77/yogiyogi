@@ -90,4 +90,5 @@ hystrix:
       
 api:
   payment:
-    url: http://payment:8080
+    url: ${payment-url}
+#    url: http://payment:8080
