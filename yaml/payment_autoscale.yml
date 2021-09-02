@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: payment
-          image: 155409331279.dkr.ecr.ap-northeast-2.amazonaws.com/bjkang77-payment:v1
+          image: 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user01-payment:v1
           ports:
             - containerPort: 8080
           resources:
