@@ -681,7 +681,7 @@ kubectl apply -f kubernetes/deployment_no_readiness.yml
 ```
 kubectl apply -f kubernetes/deployment.yaml
 ```
-![Readiness 2](https://user-images.githubusercontent.com/3106233/130053849-49de6039-299a-47fa-adde-dac3e114dab0.png)
+![readiness2](https://user-images.githubusercontent.com/87048664/131802717-d0a89d2d-d35d-4685-9761-f296a5652a76.png)
 
 재배포 시 Availability 가 변화없기 때문에 무정지 재배포가 성공한 것으로 확인됨.
 
