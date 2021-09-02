@@ -16,9 +16,15 @@ spec:
     spec:
       containers:
         - name: hotel
-          image: AWS_IMAGE_NAME
+          image: IMAGE_NAME
           ports:
             - containerPort: 8080
+          env:
+            - name: IMAGE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: hotel-cm
+                key: AWS_IMAGE_NAME
           readinessProbe:
             httpGet:
               path: '/actuator/health'
