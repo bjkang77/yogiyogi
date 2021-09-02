@@ -17,6 +17,10 @@ spec:
       containers:
         - name: hotel
           image: IMAGE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: hotel-cm
+                key: AWS_IMAGE_NAME
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -35,9 +39,3 @@ spec:
             timeoutSeconds: 2
             periodSeconds: 5
             failureThreshold: 5
-env:
-  - name: IMAGE_NAME
-    valueFrom:
-      configMapKeyRef:
-        name: hotel-cm
-        key: AWS_IMAGE_NAME
