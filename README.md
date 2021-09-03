@@ -667,7 +667,7 @@ spec:
 - Readiness 설정 없는 상태로 재배포
 
 ```
-kubectl apply -f kubernetes/deployment_no_readiness.yml
+kubectl apply -f yaml/deployment_no_readiness.yml
 ```
 
 - seige에서  Availability 가 100% 미만으로 떨어졌는지 확인
